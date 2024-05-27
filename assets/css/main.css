@@ -4089,3 +4089,14 @@ input, select, textarea {
   margin-top: 5px;   /* Adjust margin for spacing */
   text-align: center;  /* Center the text under the icon */
 }
+
+.icons li {
+  display: flex; /* Enable flexbox layout for list items */
+  align-items: center; /* Align elements vertically in the middle */
+  justify-content: center; /* Distribute space evenly between icons and text */
+}
+
+.icons li div {
+  text-align: center; /* Center text within the container */
+}
+
