@@ -3582,7 +3582,15 @@ input, select, textarea {
 		overflow: hidden;
 		position: relative;
 		text-align: center;
+		align-items: center;
 	}
+
+	#banner .inner {
+    		display: flex;
+    		flex-direction: column;
+    		align-items: center;
+	}
+
 
 		#banner h2 {
 			-moz-transform: scale(1);
