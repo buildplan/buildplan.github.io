@@ -4064,3 +4064,9 @@ input, select, textarea {
         transform: scaleX(0);
     }
 }
+
+.banner-text-container {
+  display: flex; /* Enable flexbox layout */
+  align-items: center; /* Align elements vertically in the middle */
+  justify-content: center; /* Align elements horizontally in the center */
+}
