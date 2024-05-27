@@ -3998,10 +3998,13 @@ input, select, textarea {
 		background-color: #1d242a;
 	}
 
+
+/* My CSS updates below */
+
 .custom-hr {
     width: 20%;      /* Adjust the width to your preference */
     height: 2px;     /* Adjust the height to your preference */
-    background-color: #000; /* Change the color to your preference */
+    background-color: #fff; /* Change the color to your preference */
     border: none;    /* Remove the default border */
-    margin: 10px 0;  /* Adjust the top and bottom margins */
+    margin: 10px auto;  /* Adjust the top and bottom margins */
 }
