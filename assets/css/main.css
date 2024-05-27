@@ -4082,3 +4082,10 @@ input, select, textarea {
   align-items: center; /* Align elements vertically in the middle */
   justify-content: center; /* Align elements horizontally in the center */
 }
+
+.footer-icon-text {
+  display: block;  /* Make the text element a block-level element */
+  font-size: 0.8em;  /* Adjust font size as needed */
+  margin-top: 5px;   /* Adjust margin for spacing */
+  text-align: center;  /* Center the text under the icon */
+}
