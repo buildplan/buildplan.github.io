@@ -4051,7 +4051,7 @@ input, select, textarea {
     width: 100%;
     height: 2px;
     background: rgba(255,255,255,0.25);
-    animation: fadeInLine 2s ease-in-out 0s 2;
+    animation: fadeInLine 1.5s ease-in-out 0s 1;
 }
 
 #banner:before {
