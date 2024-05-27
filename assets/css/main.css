@@ -4003,8 +4003,8 @@ input, select, textarea {
 
 .custom-hr {
     width: 20%;      /* Adjust the width to your preference */
-    height: 2px;     /* Adjust the height to your preference */
+    height: 1px;     /* Adjust the height to your preference */
     background-color: #fff; /* Change the color to your preference */
     border: none;    /* Remove the default border */
-    margin: 10px auto;  /* Adjust the top and bottom margins */
+    margin: 5px auto;  /* Adjust the top and bottom margins */
 }
