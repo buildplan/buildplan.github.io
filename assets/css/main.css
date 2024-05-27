@@ -4019,7 +4019,8 @@ input, select, textarea {
     background-color: #fff;
     border: none;
     margin: 5px auto;
-    animation: hrAnimation 2s ease-in-out 0s 1;
+    animation: fadeInLine 1.5s ease-in-out 0s 1, forwards;
+    animation-fill-mode: forwards;
 }
 
 @keyframes hrAnimation {
