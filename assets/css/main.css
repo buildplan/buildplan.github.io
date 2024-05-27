@@ -4019,7 +4019,7 @@ input, select, textarea {
     background-color: #fff;
     border: none;
     margin: 5px auto;
-    animation: hrAnimation 2s ease-in-out 0s 2;
+    animation: hrAnimation 2s ease-in-out 0s 1;
 }
 
 @keyframes hrAnimation {
