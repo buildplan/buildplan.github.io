@@ -3997,3 +3997,11 @@ input, select, textarea {
 	body.is-mobile.landing #footer {
 		background-color: #1d242a;
 	}
+
+.custom-hr {
+    width: 20%;      /* Adjust the width to your preference */
+    height: 2px;     /* Adjust the height to your preference */
+    background-color: #000; /* Change the color to your preference */
+    border: none;    /* Remove the default border */
+    margin: 10px 0;  /* Adjust the top and bottom margins */
+}
