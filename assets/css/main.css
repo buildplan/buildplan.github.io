@@ -4155,16 +4155,16 @@ input, select, textarea {
 form {
     display: flex;
     flex-direction: column;
-    padding: 10px; /* Adjust the value as needed */
-    gap: 10px;
+    padding: 15px; /* Adjust the value as needed */
 }
 
 form input, form textarea {
     margin-bottom: 10px;
-    padding: 10px;
+    padding: 30px;
     border: 1px solid #ccc;
     border-radius: 5px;
     max-width: 100%; /* Adjust the value as needed */
+    gap: 30px;
 }
 
 textarea[name="message"] {
@@ -4179,7 +4179,7 @@ form input[type="submit"] {
     display: flex;
     justify-content: center;
     gap: 30px; /* Adjust gap value as needed */
-  /* align-items: center; */ /* Optional: centers vertically if content has different heights */
+    align-items: center; /* Optional: centers vertically if content has different heights */
 }
 
 /* form button {
