@@ -4306,19 +4306,3 @@ input, select, textarea {
 
     /*=====  End of Contact form  ======*/
 
-/* Keep header fixed at top */
-header#header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 100;
-}
-
-/* Styles for sticky navigation */
-nav#nav.sticky {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 110;
-}
