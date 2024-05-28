@@ -1,5 +1,4 @@
 /*
-	Spectral by HTML5 UP
 	html5up.net | @ajlkn
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 */
@@ -68,29 +67,7 @@
       			visibleClass: 'is-menu-visible'
     				});
 					});
-
-	// New code for sticky menu behavior
-
-		// function handleScroll() {
-  			// const nav = document.getElementById('nav');
-  			// const scrollY = window.scrollY; // Get scroll position
-  			// const sectionOne = document.getElementById('one'); // Get target section
-  			// const sectionTop = sectionOne.offsetTop; // Get section's offset from top
-
-  			// if (scrollY > sectionTop) {
-    				// nav.classList.add('sticky'); // Add 'sticky' class when scrolled past section
-  				// } else {
-    				// nav.classList.remove('sticky'); // Remove 'sticky' class on top or before section
-  					// }
-				// }
-
-	// Add event listener for scroll
-		// window.addEventListener('scroll', handleScroll);
-
-	// Optional: Call the function on page load
-		// handleScroll();
-
-
+    
 	// Header.
 		if ($banner.length > 0
 		&&	$header.hasClass('alt')) {
@@ -108,6 +85,17 @@
 
 })(jQuery);
 
+// Footer current year
 const currentYear = new Date().getFullYear();
 document.getElementById('current-year').textContent = currentYear;
+
+// Scroll to about
+function scrollToSection(targetId) {
+    const element = document.getElementById(targetId);
+    if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+    } else {
+        console.error("Element with id '" + targetId + "' not found!");
+    }
+}
 
