@@ -4171,8 +4171,9 @@ form input[type="submit"] {
 }
 
 .contact-content {
-  display: flex;
-  justify-content: center;
+    display: flex;
+    justify-content: center;
+    gap: 40px; /* Adjust gap value as needed */
   /* align-items: center; */ /* Optional: centers vertically if content has different heights */
 }
 
