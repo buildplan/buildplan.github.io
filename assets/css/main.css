@@ -4140,11 +4140,18 @@ input, select, textarea {
     display: none; /* Hide the image on small screens */
 }
 
+/* Show the image on larger screens (min-width: 768px) */
 @media screen and (min-width: 768px) {
-  .contact-image {
-    display: block; /* Show the image on larger screens */
-  }
+    .contact-image {
+        display: block;
+    }
 }
+
+/* Additional styles for the form container on small screens */
+@media screen and (max-width: 767px) {
+    .contact-container {
+        /* Adjust margins, font sizes, or other properties as needed */
+    }
 
 .contact-form {
     flex: 1;
