@@ -4169,6 +4169,13 @@ form input, form textarea {
 form input[type="submit"] {
   max-width: 200px; /* Adjust the value as needed */
 }
+
+.contact-content {
+  display: flex;
+  justify-content: center;
+  /* align-items: center; */ /* Optional: centers vertically if content has different heights */
+}
+
 /* form button {
   padding: 10px;
   border: none;
