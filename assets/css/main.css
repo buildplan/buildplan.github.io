@@ -4117,6 +4117,7 @@ input, select, textarea {
     height: 400px;
     max-width: 100%;
     margin: 10px;
+    background-color: lightgray; /* Fallback color */
 }
 
 .contact-form {
