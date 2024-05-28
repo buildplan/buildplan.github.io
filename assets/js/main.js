@@ -52,7 +52,7 @@
 
 	// Menu.
 	
-	// Existing menu panel code (outside a function)
+	// Existing menu panel code 
 		$(document).ready(function() {
   		$('#menu')
     			.append('<a href="#menu" class="close"></a>')
@@ -71,24 +71,24 @@
 
 	// New code for sticky menu behavior
 
-		function handleScroll() {
-  			const nav = document.getElementById('nav');
-  			const scrollY = window.scrollY; // Get scroll position
-  			const sectionOne = document.getElementById('one'); // Get target section
-  			const sectionTop = sectionOne.offsetTop; // Get section's offset from top
+		// function handleScroll() {
+  			// const nav = document.getElementById('nav');
+  			// const scrollY = window.scrollY; // Get scroll position
+  			// const sectionOne = document.getElementById('one'); // Get target section
+  			// const sectionTop = sectionOne.offsetTop; // Get section's offset from top
 
-  			if (scrollY > sectionTop) {
-    				nav.classList.add('sticky'); // Add 'sticky' class when scrolled past section
-  				} else {
-    				nav.classList.remove('sticky'); // Remove 'sticky' class on top or before section
-  					}
-				}
+  			// if (scrollY > sectionTop) {
+    				// nav.classList.add('sticky'); // Add 'sticky' class when scrolled past section
+  				// } else {
+    				// nav.classList.remove('sticky'); // Remove 'sticky' class on top or before section
+  					// }
+				// }
 
 	// Add event listener for scroll
-		window.addEventListener('scroll', handleScroll);
+		// window.addEventListener('scroll', handleScroll);
 
 	// Optional: Call the function on page load
-		handleScroll();
+		// handleScroll();
 
 
 	// Header.
