@@ -4163,11 +4163,11 @@ form input, form textarea {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    max-width: 90%; /* Adjust the value as needed */
+    max-width: 100%; /* Adjust the value as needed */
 }
 
 form input[type="submit"] {
-  max-width: 200px; /* Adjust the value as needed */
+  max-width: 100px; /* Adjust the value as needed */
 }
 
 .contact-content {
