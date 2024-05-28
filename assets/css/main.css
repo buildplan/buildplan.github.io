@@ -4153,17 +4153,22 @@ input, select, textarea {
 }
 
 form {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
+    padding: 20px; /* Adjust the value as needed */
 }
 
 form input, form textarea {
-  margin-bottom: 10px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    max-width: 90%; /* Adjust the value as needed */
 }
 
+form input[type="submit"] {
+  max-width: 200px; /* Adjust the value as needed */
+}
 /* form button {
   padding: 10px;
   border: none;
