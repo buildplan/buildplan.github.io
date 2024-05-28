@@ -18,6 +18,7 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
         <link rel="stylesheet" href="assets/css/main.css" />
+        <link rel="stylesheet" href="assets/css/contact.css" />
         <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
     </head>
     
@@ -45,44 +46,33 @@
                 </nav>
             </header>
 
-            <!-- Main -->
-            <article id="main">
-                <header>
-                    <h2>Contact</h2>
-                    <p>Get in touch with me using the form below</p>
-                </header>
-                <section class="wrapper style5">
-                    <div class="inner contact-container">
-                        <div class="contact-image"></div>
-                        <div class="contact-form">
-                            <section class="formcarry-container">
-                                <form action="https://formspree.io/f/xayrzgnz" method="POST" onsubmit="window.location.href = 'thankyou.html';">
-                                    
-                                    <div class="formcarry-block">
-                                        <label for="fc-generated-1-name">Full Name</label>
-                                        <input type="text" name="name" id="fc-generated-1-name" placeholder="Your first and last name">
-                                    </div>
-                                    <div class="formcarry-block">
-                                        <label for="fc-generated-1-email">Your Email Address</label>
-                                        <input type="email" name="email" id="fc-generated-1-email" placeholder="john@doe.com">
-                                    </div>
-                                    <div class="formcarry-block">
-                                        <label for="fc-generated-1-phone">Your Phone Number</label>
-                                        <input type="phone" name="phone" id="fc-generated-1-phone" placeholder="+447.........">
-                                    </div>
-                                    <div class="formcarry-block">
-                                        <label for="fc-generated-1-message">Your message</label>
-                                        <textarea name="message" id="fc-generated-1-message" placeholder="Enter your message..."></textarea>
-                                    </div>
-                                    <div class="formcarry-block">
-                                        <button class="button fit primary" type="submit">Send</button>
-                                    </div>
-                                </form>
-                            </section>
-                        </div>
-                    </div>
-                </section>
-            </article>
+<!-- Main -->
+    <article id="main">
+        <header>
+            <h2>Contact</h2>
+            <p>Get in touch with me using the form below</p>
+        </header>
+        <section class="wrapper style5">
+            <div class="contact-container">
+                <div class="image05-container">
+                    <img src="images/contact01.jpg" alt="Image">
+                </div>
+                <div class="cform-container">
+                    <form action="https://formspree.io/f/xayrzgnz" method="POST" onsubmit="window.location.href = 'thankyou.html';">
+                        <label>Name</label>
+                        <input type="text" name="name" placeholder="Your Name" required>
+                        <label>Email</label>
+                        <input type="email" name="email" placeholder="Your Email Address" required>
+                        <label>Phone</label>
+                        <input type="tel" name="phone" placeholder="Your Phone Number" required>
+                        <label>Message</label>
+                        <textarea name="message" placeholder="Type Your Message..." required></textarea>
+                        <button type="submit">Send</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </article>
 
             <!-- Footer -->
             <footer id="footer">
