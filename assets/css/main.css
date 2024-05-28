@@ -4155,7 +4155,7 @@ input, select, textarea {
 form {
     display: flex;
     flex-direction: column;
-    padding: 25px; /* Adjust the value as needed */
+    padding: 10px; /* Adjust the value as needed */
     gap: 10px;
 }
 
