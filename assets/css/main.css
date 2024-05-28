@@ -4112,7 +4112,7 @@ input, select, textarea {
 .contact-image {
     flex: 1;
     min-width: 300px;
-    background: url('../images/contact01.jpg') no-repeat center center;
+    background: url('/images/contact01.jpg') no-repeat center center;
     background-size: cover;
     height: 400px;
     max-width: 100%;
