@@ -4122,7 +4122,12 @@ input, select, textarea {
 /* Contact Page Image  */
 
 .contact-container {
-    display: flex;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    min-height: 400px; /* Adjust as needed */
+    position: relative; /* Required for absolute positioning */
+    display: flex; /* Use flexbox for positioning */
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
