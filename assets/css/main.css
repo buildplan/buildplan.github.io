@@ -4178,12 +4178,7 @@ form input[type="submit"] {
   max-width: 125px; /* Adjust the value as needed */
 }
 
-.contact-content {
-    display: flex;
-    justify-content: center;
-    gap: 15px; /* Adjust gap value as needed */
-    align-items: center; /* Optional: centers vertically if content has different heights */
-}
+
 
 /* form button {
   padding: 10px;
@@ -4200,7 +4195,7 @@ form button:hover {
 
 
  .ch3 {
-     margin-bottom: 15px; /* Adjust the value for desired spacing */
+     margin-bottom: 10px; /* Adjust the value for desired spacing */
      text-align: center;
  }
 
