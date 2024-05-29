@@ -4126,19 +4126,19 @@ input, select, textarea {
 	gap: 30px;
 	justify-content: center;
 	align-items: center;
-	/* max-width: 100%;
+	max-width: auto;
 	height: 120vh; */
 }
 
 .cform-container {
 	flex: 1;
 	padding: 15px;
-	/* max-width: auto; */
+	max-width: auto;
 }
 
 .image05-container {
 	flex: 1;
-  	/* max-width: auto; */
+  	max-width: auto;
   	display: flex;
   	justify-content: center;
   	align-items: center;
@@ -4179,11 +4179,8 @@ form input[type="submit"] {
 	max-width: 125px; /* Adjust the value as needed */
 }
 
-
-
 form button {
 	padding: 10px;
-  	border: none;
 }
 
  .ch3 {
