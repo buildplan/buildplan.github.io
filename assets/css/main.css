@@ -4131,13 +4131,14 @@ input, select, textarea {
 }
 
 .cform-container {
-	/* flex: 1; */
-	max-width: auto;
+	flex: 1;
+	padding: 15px;
+	/* max-width: auto; */
 }
 
 .image05-container {
-  /* flex: 1; */
-  max-width: auto;
+  flex: 1;
+  /* max-width: auto; */
   display: flex;
   justify-content: center;
   align-items: center;
