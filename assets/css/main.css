@@ -4097,26 +4097,26 @@ input, select, textarea {
 }
 
 .banner-text-container {
-  display: flex; /* Enable flexbox layout */
-  align-items: center; /* Align elements vertically in the middle */
-  justify-content: center; /* Align elements horizontally in the center */
+  	display: flex; /* Enable flexbox layout */
+  	align-items: center; /* Align elements vertically in the middle */
+  	justify-content: center; /* Align elements horizontally in the center */
 }
 
 .footer-icon-text {
-  display: block;  /* Make the text element a block-level element */
-  font-size: 0.8em;  /* Adjust font size as needed */
-  margin-top: 5px;   /* Adjust margin for spacing */
-  text-align: center;  /* Center the text under the icon */
+  	display: block;  /* Make the text element a block-level element */
+  	font-size: 0.8em;  /* Adjust font size as needed */
+  	margin-top: 5px;   /* Adjust margin for spacing */
+  	text-align: center;  /* Center the text under the icon */
 }
 
 .icons li {
-  display: flex; /* Enable flexbox layout for list items */
-  align-items: center; /* Align elements vertically in the middle */
-  justify-content: center; /* Distribute space evenly between icons and text */
+	display: flex; /* Enable flexbox layout for list items */
+  	align-items: center; /* Align elements vertically in the middle */
+  	justify-content: center; /* Distribute space evenly between icons and text */
 }
 
 .icons li div {
-  text-align: center; /* Center text within the container */
+	text-align: center; /* Center text within the container */
 }
 
 /* Contact Form Page */
@@ -4131,34 +4131,34 @@ input, select, textarea {
 }
 
 .cform-container {
-	flex: 2;
+	flex: 1;
 	padding: 15px;
 	/* max-width: auto; */
 }
 
 .image05-container {
-  flex: 1;
-  /* max-width: auto; */
-  display: flex;
-  justify-content: center;
-  align-items: center;
+	flex: 1;
+  	/* max-width: auto; */
+  	display: flex;
+  	justify-content: center;
+  	align-items: center;
 }
 
 .image05-container img {
-  height: 100%;
-  max-height: 600px;
+	height: 100%;
+  	max-height: 600px;
 }
 
 @media screen and (max-width: 768px) {
-  .image05-container {
-    display: none;
-  }
+	.image05-container {
+    	display: none;
+	}
 }
 
 form {
-    display: flex;
-    flex-direction: column;
-    padding: 15px; /* Adjust the value as needed */
+	display: flex;
+    	flex-direction: column;
+    	padding: 15px; /* Adjust the value as needed */
 }
 
 form input, form textarea {
@@ -4166,38 +4166,29 @@ form input, form textarea {
 	padding: 30px;
 	border: 1px solid #ccc;
 	border-radius: 5px;
-	max-width: 120%; /* Adjust the value as needed */
+	/* max-width: 120%; */ /* Adjust the value as needed */
 	gap: 10px;
 }
 
 textarea[name="message"] {
 	height: 170px; /* Adjust height value as needed */
-	width: 90%;  /* Adjust width value as needed */
+	/* width: 90%; */  /* Adjust width value as needed */
 }
 
 form input[type="submit"] {
-  max-width: 125px; /* Adjust the value as needed */
+	max-width: 125px; /* Adjust the value as needed */
 }
 
 
 
-/* form button {
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  background-color: #007BFF;
-  color: white;
-  cursor: pointer;
+form button {
+	padding: 10px;
+  	border: none;
 }
-
-form button:hover {
-  background-color: #0056b3;
-}*/
-
 
  .ch3 {
-     margin-bottom: 10px; /* Adjust the value for desired spacing */
-     text-align: center;
+	 margin-bottom: 10px; /* Adjust the value for desired spacing */
+	 text-align: center;
  }
 
 /* end of Form Page */
