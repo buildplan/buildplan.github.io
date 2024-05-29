@@ -4165,7 +4165,7 @@ form input, form textarea {
     padding: 30px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    max-width: 100%; /* Adjust the value as needed */
+    max-width: 120%; /* Adjust the value as needed */
     gap: 10px;
 }
 
@@ -4174,13 +4174,13 @@ textarea[name="message"] {
 }
 
 form input[type="submit"] {
-  max-width: 100px; /* Adjust the value as needed */
+  max-width: 125px; /* Adjust the value as needed */
 }
 
 .contact-content {
     display: flex;
     justify-content: center;
-    gap: 20px; /* Adjust gap value as needed */
+    gap: 15px; /* Adjust gap value as needed */
     align-items: center; /* Optional: centers vertically if content has different heights */
 }
 
