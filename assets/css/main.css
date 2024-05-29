@@ -4162,16 +4162,17 @@ form {
 }
 
 form input, form textarea {
-    margin-bottom: 10px;
-    padding: 30px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    max-width: 120%; /* Adjust the value as needed */
-    gap: 10px;
+	margin-bottom: 10px;
+	padding: 30px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	max-width: 120%; /* Adjust the value as needed */
+	gap: 10px;
 }
 
 textarea[name="message"] {
-  height: 170px; /* Adjust height value as needed */
+	height: 170px; /* Adjust height value as needed */
+	width: 90%;  /* Adjust width value as needed */
 }
 
 form input[type="submit"] {
