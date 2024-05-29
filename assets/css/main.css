@@ -4131,7 +4131,7 @@ input, select, textarea {
 }
 
 .cform-container {
-	flex: 1;
+	flex: 2;
 	padding: 15px;
 	/* max-width: auto; */
 }
