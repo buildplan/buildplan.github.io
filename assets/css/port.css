@@ -273,28 +273,6 @@
     background-color: rgba(0, 0, 0, 0.8);
 }
 
-.overlay-content {
-    position: relative;
-    top: 10%;
-    margin: auto;
-    padding: 20px;
-    width: 80%;
-    max-width: 700px;
-    background: white; /* White background for the content */
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    text-align: center;
-    color: black; /* Set text color to black */
-
-.overlay-content h2 {
-    margin-top: 0;
-    color: black; /* Ensure the heading is also black */
-}
-
-.overlay-content p {
-    color: black; /* Ensure paragraphs are also black */
-
-
 .overlay .close {
     position: absolute;
     top: 10px;
