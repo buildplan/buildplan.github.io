@@ -1,0 +1,259 @@
+/* SECTION NO 5 */
+
+.section-5 {
+    padding: 50px 0px 50px 0px;
+}
+
+.section-5-text {
+    font-family: 'PT Sans', sans-serif;
+    font-size: 42px;
+    font-weight: 300;
+    line-height: 1.6;
+    color: #000000;
+    width: 50%;
+}
+
+@keyframes changing-colors {
+    0% {
+        color: #FED85F;
+    }
+
+    100% {
+        color: #000000;
+    }
+}
+
+.section-5-icon {
+    margin-top: 30px;
+}
+
+.sec5-icon {
+    font-size: 100px;
+    animation: changing-colors 2s infinite;
+}
+
+.sec5-portfolio-head {
+    font-size: 24px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.work-gallery-row {
+    padding: 0px 20px 0px 20px;
+}
+
+@media (max-width: 1024px) {
+    .section-5-text {
+        width: 75%;
+    }
+}
+
+@media (max-width: 768px) {
+    .section-5-text {
+        font-size: 32px;
+    }
+
+    .sec5-icon {
+        font-size: 70px;
+    }
+}
+
+@media (max-width: 426px) {
+    .section-5-text {
+        font-size: 28px;
+        line-height: 1.5;
+        width: 90%;
+    }
+
+    .section-5-icon {
+        margin: 10px 0px 10px 0px;
+    }
+
+    .sec5-icon {
+        font-size: 50px;
+    }
+
+    .sec5-portfolio-head {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 320px) {
+    .section-5 {
+        padding: 30px 0px;
+    }
+
+    .section-5-text {
+        font-size: 24px;
+        line-height: 1.4;
+        width: 95%;
+    }
+
+    .sec5-icon {
+        font-size: 40px;
+    }
+
+    .sec5-portfolio-head {
+        font-size: 14px;
+    }
+
+    .work-gallery-row {
+        padding: 0px 10px 0px 10px;
+    }
+}
+
+/* Masonry Grid */
+
+.masonry {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    column-gap: 30px;
+    row-gap: 10px;
+}
+
+@media (max-width: 1440px) {
+    .masonry {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 1200px) {
+    .masonry {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .masonry {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .masonry {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+.masonry .grid {
+    display: inline-block;
+    margin-bottom: 16px;
+    position: relative;
+}
+
+.masonry .grid:before {
+    border-radius: 5px;
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    transition: all 0.4s ease-in-out;
+}
+
+.masonry .grid:hover::before {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.masonry .grid:hover {
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    transform: scale(1.04);
+    transition: all 0.1s ease-in-out;
+}
+
+.masonry .grid img {
+    width: 100%;
+    border-radius: 5px;
+}
+
+.masonry .grid__title {
+    font-size: 28px;
+    font-weight: bold;
+    margin: 0px 0px 10px 0px;
+}
+
+.masonry .grid__author {
+    font-size: 14px;
+    font-weight: 300;
+}
+
+.masonry .grid__link {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.masonry .grid__body {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    padding: 30px 30px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+.masonry .grid__tag {
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #333;
+    border-radius: 5px;
+    padding: 4px 10px;
+    margin-bottom: 5px;
+}
+
+.mt-auto {
+    margin-top: auto;
+}
+
+.sec5-btn {
+    font-family: Roboto, sans-serif;
+    color: #FFFFFF;
+    background-color: #000000;
+    letter-spacing: 2px;
+    padding: 10px 30px;
+    border: none;
+    box-shadow: 3px 4px 2px rgba(0, 0, 0, 0.2);
+    transition: all 0.5s ease;
+}
+
+.sec5-btn:hover {
+    color: #000000;
+    background-color: #FFFFFF;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.4);
+    transform: translateY(-5px);
+}
+
+.sec5-btn:active {
+    transform: translateY(0px);
+}
+
+@media (max-width: 426px) {
+    .sec5-btn {
+        padding: 5px 18px;
+        letter-spacing: 1px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 320px) {
+    .masonry .grid__body {
+        padding: 20px 20px;
+    }
+
+    .masonry .grid__tag {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 320px) {
+    .sec5-btn {
+        padding: 5px 15px;
+        font-size: 10px;
+    }
+}
