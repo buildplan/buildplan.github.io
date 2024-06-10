@@ -101,12 +101,14 @@ function scrollToSection(targetId) {
 
 // portfolio page
 
-function openModal(modalId) {
-    document.getElementById(modalId).style.display = "block";
+// Overlay
+
+function openOverlay(project) {
+    document.getElementById('overlay-' + project).style.display = "block";
 }
 
-function closeModal(modalId) {
-    document.getElementById(modalId).style.display = "none";
+function closeOverlay(project) {
+    document.getElementById('overlay-' + project).style.display = "none";
 }
 
 // Close the modal if the user clicks outside of the modal content
