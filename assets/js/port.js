@@ -18,7 +18,10 @@ document.addEventListener('DOMContentLoaded', function () {
             overlayTitle.textContent = this.dataset.title;
             overlayTag.textContent = this.dataset.tag;
             overlayDescription.innerHTML = decodeHtml(this.dataset.description);
+            
+            // Dynamically set the "Find more" link
             overlayLink.href = this.dataset.link;
+            overlayLink.textContent = "Find more";
 
             // Clear previous images
             overlayImages.innerHTML = '';
