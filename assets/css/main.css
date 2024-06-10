@@ -4119,4 +4119,15 @@ input, select, textarea {
 	text-align: center; /* Center text within the container */
 }
 
+/* portfolio photo reel */
 
+.photo-reel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adjust as needed */
+  gap: 10px; /* Adjust spacing between images */
+}
+
+.photo-reel img {
+  width: 100%; /* Ensures images fill container width */
+  object-fit: cover; /* Ensures images maintain aspect ratio */
+}
