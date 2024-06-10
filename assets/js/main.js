@@ -99,26 +99,6 @@ function scrollToSection(targetId) {
     }
 }
 
-// portfolio page
 
-// Overlay
-
-function openOverlay(project) {
-    document.getElementById('overlay-' + project).style.display = "block";
-}
-
-function closeOverlay(project) {
-    document.getElementById('overlay-' + project).style.display = "none";
-}
-
-// Close the modal if the user clicks outside of the modal content
-window.onclick = function(event) {
-    let modals = document.getElementsByClassName('modal');
-    for (let i = 0; i < modals.length; i++) {
-        if (event.target == modals[i]) {
-            modals[i].style.display = "none";
-        }
-    }
-}
 
 
