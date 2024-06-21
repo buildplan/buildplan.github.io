@@ -1,0 +1,71 @@
+/* Timeline Section */
+.timeline {
+  list-style: none;
+  padding: 0;
+  position: relative;
+}
+
+.timeline:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: #e9ecef;
+  left: 50%;
+  margin-left: -1px;
+}
+
+.timeline > li {
+  position: relative;
+  margin-bottom: 50px;
+}
+
+.timeline > li:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.timeline > li .timeline-panel {
+  position: relative;
+  width: 45%;
+  padding: 20px;
+  text-align: left;
+  background: #f8f9fa;
+  border-radius: 2px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.timeline > li .timeline-image {
+  position: absolute;
+  z-index: 100;
+  width: 100px;
+  height: 100px;
+  left: 50%;
+  top: 0;
+  margin-left: -50px;
+  background-color: #6c757d;
+  border: 7px solid #f8f9fa;
+  border-radius: 50%;
+}
+
+.timeline > li.timeline-inverted > .timeline-panel {
+  float: right;
+}
+
+.timeline > li.timeline-inverted > .timeline-image {
+  left: auto;
+  right: 50%;
+  margin-right: -50px;
+}
+
+.timeline > li .timeline-panel .timeline-heading h4 {
+  margin-top: 0;
+  color: #007bff;
+}
+
+.timeline > li .timeline-panel .timeline-body p {
+  margin-bottom: 0;
+  color: #6c757d;
+}
