@@ -299,9 +299,9 @@
     margin-bottom: 10px;
 }
 
-.overlay-content h3 {
+/* .overlay-content h3 {
     font-size: 20px; /* Adjust font size as needed */
-    margin-bottom: 10px;
+/*    margin-bottom: 10px;
 }
 
 .overlay-content p {
@@ -323,7 +323,7 @@
     margin-top: 20px; /* Add some space above the button */
 }
 
-.overlay-content .button.primary:hover {
+/* .overlay-content .button.primary:hover {
     color: #000000;
     background-color: #FFFFFF;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.4);
@@ -331,7 +331,7 @@
 }
 
 .overlay-content .button.primary:active {
-    transform: translateY(0px);
+    transform: translateY(0px); */
 }
 
 .overlay-images {
