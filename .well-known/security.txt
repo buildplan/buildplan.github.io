@@ -1,1 +1,6 @@
+Contact: mailto:hello@planning.construction
+Expires: 2026-12-23T00:00:00.000Z
+Encryption: https://planning.construction/assets/pgp-key.txt
+Preferred-Languages: en
+Policy: https://planning.construction/.well-known/security.txt
 
