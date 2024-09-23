@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You for Reporting</title>
+    <style>
+        /* Add your CSS styling here */
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding: 50px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #007bff;
+        }
+
+        p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        form {
+            display: inline-block;
+        }
+
+        input[type="email"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Thank You!</h1>
+    <p>We appreciate you taking the time to report a security issue. Your help is invaluable in keeping our website safe.</p>
+
+    <form action="mailto:security@mail.planning.construction" method="post" enctype="text/plain">
+        <input type="email" name="email" placeholder="Your Email (Optional)">
+        <input type="submit" value="Submit">
+    </form>
+
+</body>
+</html>
