@@ -164,28 +164,35 @@
 			</div>
 		</section>
 	</article>
-        <!-- Footer -->
+
+	 <!-- Footer -->
         <footer id="footer">
             <ul class="icons">
                 <li>
-                    <a href="https://x.com/_AliSufyan" target="_blank" aria-label="Twitter/X" rel="noopener">
-                        <i class="fa-brands fa-x-twitter"></i>
+                    <a rel="me" href="https://mastodonapp.uk/@sufi" target="_blank">
+                        <span class="label"><i class="fa-brands fa-mastodon"></i></span>
+                        <span class="footer-icon-text">Mastodon</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://x.com/_AliSufyan" target="_blank">
+                        <span class="label"><i class="fa-brands fa-x-twitter"></i></span>
                         <span class="footer-icon-text">Twitter/X</span>
                     </a>
                 </li>
                 <li>
-                    <a href="https://www.linkedin.com/in/alisufyan/" target="_blank" aria-label="LinkedIn" rel="noopener">
-                        <i class="fa-brands fa-linkedin-in"></i>
+                    <a href="https://www.linkedin.com/in/alisufyan/" target="_blank">
+                        <span class="label"><i class="fa-brands fa-linkedin-in"></i></span>
                         <span class="footer-icon-text">LinkedIn</span>
                     </a>
                 </li>
                 <li>
-                    <a href="mailto:hello@planning.construction" target="_blank" aria-label="Email" class="icon solid fa-envelope" rel="noopener">
+                    <a href="mailto:hello@planning.construction" target="_blank">
+                        <span class="label"><i class="fa-regular fa-envelope"></i></span>
                         <span class="footer-icon-text">Email</span>
                     </a>
                 </li>
             </ul>
-
             <ul class="copyright">
                 <li>&copy; 2023-<span id="current-year"></span> | <a href="mailto:hello@planning.construction">Ali Sufyan</a> | <a href="https://planning.construction">planning.construction</a></li>
             </ul>
@@ -201,10 +208,5 @@
     <script src="assets/js/util.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/fontawesome.min.js"></script>
-    <script>
-        // Auto-update year
-        const currentYearSpan = document.getElementById("current-year");
-	    currentYearSpan.textContent = new Date().getFullYear();
-    </script>
 </body>
 </html>
