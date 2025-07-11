@@ -4,11 +4,11 @@ title: Home
 nav_order: 1
 ---
 
-# **Welcome to My Project Documentation!**
+# **buildplan Project Documentation!**
 
 Website hosts to documentation for my various GitHub repositories. Hope to create detailed guides and more for future refrence.
 
-## **My Projects**
+## **Projects**
 
 Some of the project documentation for:
 

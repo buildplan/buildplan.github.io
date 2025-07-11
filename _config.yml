@@ -5,6 +5,9 @@ remote_theme: "just-the-docs/just-the-docs"
 color_scheme: dark
 search_enabled: true
 
+favicon_ico: "/assets/images/favicon.ico"
+logo: "/assets/images/buildplan_logo.png"
+
 url: "https://buildpaln.org"
 
 aux_links:
