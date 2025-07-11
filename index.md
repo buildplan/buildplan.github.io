@@ -26,3 +26,5 @@ Some of the project documentation for:
     This is a fork of [marc1307/tailscale-cloudflare-dnssync](https://github.com/marc1307/tailscale-cloudflare-dnssync).
     This version includes fixes for error reporting bugs encountered during API communication (ensuring clearer diagnostic messages) and has been tested with Headscale v0.25.1 & v0.26.x.
 
+* ### [**Creating a Documentation Site with Jekyll and GitHub Pages**](./docs-jekyll-site/getting-started.md)
+    Creating a Documentation Site with Jekyll and GitHub Pages, Using "Just the Docs" theme and host it for free on GitHub Pages and then connect it to a custom domain.
