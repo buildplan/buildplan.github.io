@@ -6,7 +6,7 @@ color_scheme: dark
 search_enabled: true
 
 favicon_ico: "/assets/images/favicon.ico"
-logo: "/assets/images/buildplan_logo.png"
+logo: "/assets/images/logo.png"
 
 url: "https://buildpaln.org"
 
