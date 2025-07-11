@@ -2,7 +2,7 @@
 layout: default
 title: Home
 nav_order: 1
-last_modified_date: 2025-07-11T21:50:27+01:00
+last_modified_date: 2025-07-11T22:50:27+01:00
 ---
 
 # **buildplan Project Documentation!**
@@ -28,3 +28,6 @@ Some of the project documentation for:
 
 * ### [**Creating a Documentation Site with Jekyll and GitHub Pages**](./docs-jekyll-site/getting-started.md)
     Creating a Documentation Site with Jekyll and GitHub Pages, Using "Just the Docs" theme and host it for free on GitHub Pages and then connect it to a custom domain.
+
+* ### [**A Secure, Automated, Multi-Site Hosting Environment**](./nginx-multi-site-hosting/getting-started.md)
+    This guide documents the end-to-end process of setting up a secure, multi-site hosting environment on a Debian 12 VPS.
