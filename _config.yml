@@ -1,0 +1,11 @@
+title: "buildplan Docs"
+description: "A hub for the documentation"
+theme: "just-the-docs"
+
+color_scheme: dark
+
+url: "https://buildpaln.github.io"
+
+aux_links:
+  "GitHub Profile":
+    - "https://github.com/buildplan"
