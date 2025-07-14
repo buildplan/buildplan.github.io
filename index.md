@@ -2,7 +2,7 @@
 layout: default
 title: Home
 nav_order: 1
-last_modified_date: 2025-07-11T22:50:27+01:00
+last_modified_date: 2025-07-14T17:20:27+01:00
 ---
 
 # **buildplan Project Documentation!**
@@ -31,3 +31,6 @@ Some of the project documentation for:
 
 * ### [**A Secure, Automated, Multi-Site Hosting Environment**](./nginx-multi-site-hosting/getting-started.md)
     This guide documents the end-to-end process of setting up a secure, multi-site hosting environment on a Debian 12 VPS.
+
+* ### [**Container Monitor**](./container-monitor/getting-started.md)
+    Container Monitor is a Bash script for monitoring Docker containers. It automates checks for container health, resource usage, and available image updates, and can send notifications if it finds any issues.
