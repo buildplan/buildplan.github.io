@@ -3,274 +3,208 @@ layout: default
 title: du_setup
 nav_order: 3
 parent: Home
+last_modified_date: 2025-07-15T12:30:00+01:00
 ---
 
 # Debian & Ubuntu Server Setup & Hardening Script
 
-**Version:** v0.58
+This document provides a guide for the `du_setup` script, a tool for the initial setup and security hardening of Debian and Ubuntu servers. It is designed to be more detailed than the standard README, offering in-depth explanations of the script's functions and processes.
 
-**Last Updated:** 2025-07-07
+### **Overview**
 
-**Compatible With:**
+The `du_setup` script is an idempotent and automated tool for establishing a secure baseline on a fresh Debian or Ubuntu server installation. It is designed to be safe for production environments, running interactively to guide you through key decisions while automating a wide array of essential security and configuration tasks.
 
-  * Debian 12
-  * Ubuntu 22.04, 24.04, 24.10 (24.10 experimental)
+**Core Principles:**
 
-## Overview
+  * **Idempotent:** Running the script multiple times will not cause negative side effects. It checks for existing configurations and skips steps that have already been completed.
+  * **Safety First:** The script backs up all critical configuration files before making any modifications. These backups are stored in a timestamped directory in `/root/`.
+  * **Interactive and Automated:** The script operates interactively by default but also supports a `--quiet` mode for fully automated provisioning.
 
-This script automates the initial setup and security hardening of a fresh Debian or Ubuntu server. It is **idempotent**, **safe**, and suitable for **production environments**, providing a secure baseline for further customization. The script runs interactively, guiding users through critical choices while automating essential security and setup tasks.
+### **Compatibility**
 
-## Features
+The script is officially compatible with the following operating systems:
 
-  * **Secure User Management**: Creates a new `sudo` user and disables root SSH access.
-  * **SSH Hardening**: Configures a custom SSH port, enforces key-based authentication, and applies security best practices.
-  * **Firewall Configuration**: Sets up UFW with secure defaults and customizable rules.
-  * **Intrusion Prevention**: Installs and configures **Fail2Ban** to block malicious IPs.
-  * **Automated Security Updates**: Enables `unattended-upgrades` for automatic security patches.
-  * **System Stability**: Configures NTP time synchronization with `chrony` and optional swap file setup for low-RAM systems.
-  * **Remote rsync Backups**: Configures automated `rsync` backups over SSH to any compatible server (e.g., Hetzner Storage Box), with SSH key automation (`sshpass` or manual), cron scheduling, ntfy/Discord notifications, and a customizable exclude file.
-  * **Backup Testing**: Includes an optional test backup to verify the rsync configuration before scheduling.
-  * **Tailscale VPN**: Installs Tailscale and connects to the standard Tailscale network (pre-auth key required) or a custom server (URL and key required). Configures optional flags (`--ssh`, `--advertise-exit-node`, `--accept-dns`, `--accept-routes`).
-  * **Security Auditing**: Optionally runs **Lynis** for system hardening audits and **debsecan** for package vulnerability checks, with results logged for review.
-  * **Safety First**: Backs up critical configuration files before modification, stored in `/root/setup_harden_backup_*`.
-  * **Optional Software**: Offers interactive installation of:
-      * Docker & Docker Compose
-      * Tailscale (Mesh VPN)
-  * **Comprehensive Logging**: Logs all actions to `/var/log/du_setup_*.log`.
-  * **Automation-Friendly**: Supports `--quiet` mode for automated provisioning.
+  * **Debian:** 12
+  * **Ubuntu LTS:** 22.04, 24.04
+  * **Ubuntu (Experimental):** 24.10, 25.04
 
-## Installation & Usage
+It has been tested on local VMs and various cloud providers, including DigitalOcean, Oracle Cloud, Hetzner, OVH Cloud and Netcup.
 
-### Prerequisites
+-----
 
-  * Fresh installation of a compatible OS.
-  * Root or `sudo` privileges.
-  * Internet access for package downloads.
-  * Minimum 2GB disk space for swap file creation and temporary files.
-  * For remote backups: An SSH-accessible server (e.g., Hetzner Storage Box) with credentials or SSH key access. For Hetzner, SSH (port 23) is used for rsync.
-  * For Tailscale: A pre-auth key from [https://login.tailscale.com/admin](https://login.tailscale.com/admin) (standard, starts with `tskey-auth-`) or from a custom server (e.g., `https://ts.mydomain.cloud`).
+### **Getting Started**
 
-### 1\. Download & Prepare Script
+#### **1. Prerequisites**
 
-```
+Before running the script, ensure you have the following:
+
+  * A fresh installation of a compatible OS.
+  * Root or `sudo` privileges. The script must be run as root.
+  * Internet access for downloading packages.
+  * A minimum of 2GB of free disk space, which is required for tasks like swap file creation.
+  * (For Remote Backups) An SSH-accessible server, such as a Hetzner Storage Box.
+  * (For Tailscale) A pre-authentication key from your Tailscale admin console.
+
+#### **2. Download and Prepare**
+
+First, download the script and make it executable.
+
+```bash
 wget https://raw.githubusercontent.com/buildplan/du_setup/refs/heads/main/du_setup.sh
 chmod +x du_setup.sh
 ```
 
-### 2\. Verify Script Integrity (Recommended)
+#### **3. Verify Script Integrity (Recommended)**
 
-To ensure the script has not been altered, you can verify its SHA256 checksum.
+To ensure the script you downloaded has not been tampered with, you should verify its SHA256 checksum. This is a critical security step.
 
 **Option A: Automatic Check**
 
-This command downloads the official checksum file and automatically compares it against your downloaded script.
+This method downloads the official checksum and compares it automatically.
 
-```
+```bash
 # Download the official checksum file
 wget https://raw.githubusercontent.com/buildplan/du_setup/refs/heads/main/du_setup.sh.sha256
 
-# Run the check (it should output: du_setup.sh: OK)
+# Run the check. The output should be: du_setup.sh: OK
 sha256sum -c du_setup.sh.sha256
 ```
 
 **Option B: Manual Check**
 
-```
+Generate the hash of your local script and compare it to the official one.
+
+```bash
 # Generate the hash of your downloaded script
 sha256sum du_setup.sh
 ```
 
-Compare the output hash to the one below. They must match exactly.
+Compare the resulting hash with the one published in the official `README.md` file. They must match exactly.
 
-`bb7b738b264aac1c04d3d13d94eac994dad9aa0f61290f0b67f37765b3c812c3`
+#### **4. Execution**
 
-Or echo the hash to check, it should output: `du_setup.sh: OK`
+Run the script with root privileges. It is recommended to use `sudo -E` to preserve environment variables.
 
-```
-echo bb7b738b264aac1c04d3d13d94eac994dad9aa0f61290f0b67f37765b3c812c3 du_setup.sh | sha256sum --check -
-```
+**Interactive Mode (Recommended):**
 
-### 3\. Run the Script
-
-**Interactively (Recommended)**
-
-Ideally run as root, if you are a sudo user you can switch to root with `sudo su`
-
-```
-./du_setup
-```
-Alternatively run with sudo -E, -E flag preserve the environment variables.
-
-```
+```bash
 sudo -E ./du_setup.sh
 ```
 
-**Quiet Mode (For Automation)**
+**Quiet Mode (For Automation):**
 
-```
+For automated provisioning, you can use the `--quiet` flag. This will suppress non-critical output and use default values where possible.
+
+```bash
 sudo -E ./du_setup.sh --quiet
 ```
 
-> **Warning**: The script pauses to verify SSH access on the new port before disabling old access methods. **Test the new SSH connection from a separate terminal before proceeding\!**
->
-> Ensure your VPS provider’s firewall allows the custom SSH port, backup server’s SSH port (e.g., 23 for Hetzner Storage Box), and Tailscale traffic (UDP 41641 for direct connections).
+-----
 
-## What It Does
+### **Core Features & Functionality**
 
-| Task                   | Description                                                                                                                                                                                          |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **System Checks** | Verifies OS compatibility, root privileges, and internet connectivity.                                                                                                                       |
-| **Package Management** | Updates packages and installs tools (`ufw`, `fail2ban`, `chrony`, `rsync`, `lynis`, `debsecan`, etc.).                                                                                        |
-| **Admin User Creation**| Creates a `sudo` user with a password and/or SSH public key.                                                                                                                                  |
-| **SSH Hardening** | Disables root login, enforces key-based auth, and sets a custom port.                                                                                                                        |
-| **Firewall Setup** | Configures UFW to deny incoming traffic by default, allowing specific ports.                                                                                                                 |
-| **Remote Backup Setup**| Configures `rsync` backups to an SSH server (e.g., `u457300-sub4@u457300.your-storagebox.de:23`). Creates `/root/run_backup.sh`, `/root/rsync_exclude.txt`, and schedules a cron job. Supports ntfy/Discord notifications. |
-| **Backup Testing** | Performs an optional test backup to verify rsync configuration, logging results to `/var/log/backup_rsync.log`.                                                                                 |
-| **Security Auditing** | Runs optional **Lynis** and **debsecan** audits, logging results to `/var/log/setup_harden_security_audit_*.log`.                                                                              |
-| **Tailscale Setup** | Installs Tailscale and connects to the standard Tailscale network (pre-auth key starting with `tskey-auth-`) or a custom server (any valid key). Configures optional flags (`--ssh`, `--advertise-exit-node`, `--accept-dns`, `--accept-routes`). |
-| **System Backups** | Saves timestamped configuration backups in `/root/setup_harden_backup_*`.                                                                                                                     |
-| **Swap File Setup** | Creates an optional swap file (e.g., 2G) with tuned settings.                                                                                                                                  |
-| **Timezone & Locales** | Configures timezone and system locales interactively.                                                                                                                                         |
-| **Docker Install** | Installs Docker Engine and adds the user to the `docker` group.                                                                                                                               |
-| **Final Cleanup** | Removes unused packages and reloads daemons.                                                                                                                                                  |
+The script is composed of several modules that handle specific aspects of server setup and hardening.
 
-## Logs & Backups
+#### **System Checks and Preparation**
 
-  * **Log Files**: `/var/log/du_setup_*.log`
-  * **Backup Logs**: `/var/log/backup_rsync.log` (for remote backup operations)
-  * **Audit Logs**: `/var/log/setup_harden_security_audit_*.log` (for Lynis and debsecan results)
-  * **Configuration Backups**: `/root/setup_harden_backup_*`
+  * **Privilege Check:** The script first verifies it's being run as root (`uid=0`). If not, it will exit with an error message.
+  * **OS Compatibility:** It reads `/etc/os-release` to ensure the OS is a compatible version of Debian or Ubuntu.
+  * **Dependency Installation:** It checks for essential tools like `curl`, `sudo`, and `gpg` and installs any that are missing.
+  * **Internet Connectivity:** It confirms internet access by attempting to connect to the official Debian or Ubuntu package archives.
 
-## Post-Reboot Verification
+#### **Secure User Management**
 
-After rebooting, verify the setup:
+This module creates a new administrative user to discourage the use of the root account for daily tasks.
 
-  * **SSH Access**: `ssh -p <custom_port> <username>@<server_ip>`
-  * **Firewall Rules**: `sudo ufw status verbose`
-  * **Time Synchronization**: `chronyc tracking`
-  * **Fail2Ban Status**: `sudo fail2ban-client status sshd`
-  * **Swap Status**: `sudo swapon --show && free -h`
-  * **Hostname**: `hostnamectl`
-  * **Docker Status** (if installed): `docker ps`
-  * **Tailscale Status** (if installed): `tailscale status`
-  * **Tailscale Verification** (if configured):
-      * Check connection: `tailscale status`
-      * Test Tailscale SSH (if enabled): `tailscale ssh <username>@<tailscale-ip>`
-      * Verify exit node (if enabled): Check Tailscale admin console
-      * If not connected, run the `tailscale up` command shown in the script output
-  * **Remote Backup** (if configured):
-      * Verify SSH key: `cat /root/.ssh/id_ed25519.pub`
-      * Copy key (if not done): `ssh-copy-id -p <backup_port> -s <backup_user@backup_host>`
-      * Test backup: `sudo /root/run_backup.sh`
-      * Check logs: `sudo less /var/log/backup_rsync.log`
-      * Verify cron job: `sudo crontab -l` (e.g., `5 3 * * * /root/run_backup.sh`)
-  * **Security Audit** (if run):
-      * Check results: `sudo less /var/log/setup_harden_security_audit_*.log`
-      * Review Lynis hardening index and debsecan vulnerabilities in the script’s summary output
+  * **New `sudo` User:** The script prompts for a new username. It then creates this user, sets a password (or can skip password creation for key-only access), and adds them to the `sudo` group.
+  * **SSH Key Configuration:** You are prompted to add an SSH public key for the new user. This is the recommended way to secure SSH access. If you don't provide a key, the script will generate a new SSH key pair (`ed25519`) and display the private key for you to save. **This is your only chance to save the generated private key.**
+  * **Disabling Root SSH Access:** As part of SSH hardening, direct SSH login for the `root` user is disabled.
 
-## Tested On
+#### **SSH Hardening**
 
-  * Debian 12
-  * Ubuntu 22.04, 24.04, 24.10 (experimental)
-  * Cloud providers: DigitalOcean, Oracle Cloud, Hetzner, Netcup
-  * Backup destinations: Hetzner Storage Box (SSH, port 23), custom SSH servers
-  * Tailscale: Standard network, custom self-hosted servers
+This is a critical step to protect the server from unauthorized access.
 
-## Important Notes
+  * **Custom SSH Port:** You will be prompted to choose a custom SSH port (default: `2222`). Using a non-standard port helps reduce exposure to automated bots scanning port 22.
+  * **Enforced Key-Based Authentication:** The script modifies the SSH daemon configuration to disable password-based authentication (`PasswordAuthentication no`) and permit only public key authentication (`PubkeyAuthentication yes`).
+  * **Configuration & Rollback:** The script creates a dedicated hardening configuration file at `/etc/ssh/sshd_config.d/99-hardening.conf`. Before finalizing changes, it prompts you to test the new SSH connection from a separate terminal. If you cannot connect, the script has a built-in function (`rollback_ssh_changes`) to restore the original SSH configuration, preventing you from being locked out.
+  * **Security Banner:** It creates a banner at `/etc/issue.net` that warns users about unauthorized access.
 
-  * **Run on a fresh system**: Designed for initial provisioning with at least 2GB free disk space.
-  * **Reboot required**: Ensures kernel and service changes apply cleanly.
-  * Test in a non-production environment (e.g., staging VM) first.
-  * Maintain out-of-band console access in case of SSH lockout.
-  * For Hetzner Storage Box, ensure `~/.ssh/` exists on the remote server: `ssh -p 23 <backup_user@backup_host> "mkdir -p ~/.ssh && chmod 700 ~/.ssh"`. Backups use SSH (port 23) for rsync, not SFTP.
-  * For Tailscale, generate a pre-auth key from [https://login.tailscale.com/admin](https://login.tailscale.com/admin) (standard, must start with `tskey-auth-`) or your custom server (any valid key). Ensure UDP 41641 is open for Tailscale traffic.
-  * For security audits, review `/var/log/setup_harden_security_audit_*.log` for Lynis and debsecan recommendations.
+#### **Firewall Configuration (UFW)**
 
-## Troubleshooting
+The script configures the Uncomplicated Firewall (UFW) to control network traffic.
 
-### SSH Lockout Recovery
+  * **Default Policies:** It sets the default policy to deny all incoming traffic and allow all outgoing traffic.
+  * **Allowed Ports:** It automatically allows the custom SSH port you selected. You are then interactively prompted to allow other common ports, such as HTTP (80), HTTPS (443), and Tailscale (UDP 41641). You can also add a list of your own custom ports.
+  * **Activation:** The firewall is enabled and its status is displayed for verification.
 
-If locked out, use your provider’s console:
+#### **Intrusion Prevention (Fail2Ban)**
 
-1.  **Remove Hardened Configuration**:
-    ```
-    sudo rm /etc/ssh/sshd_config.d/99-hardening.conf
-    ```
-2.  **Restore Original `sshd_config`**:
-    ```
-    LATEST_BACKUP=$(ls -td /root/setup_harden_backup_* | head -1)
-    sudo cp "$LATEST_BACKUP"/sshd_config.backup_* /etc/ssh/sshd_config
-    ```
-3.  **Restart SSH**:
-    ```
-    sudo systemctl restart ssh
-    ```
+Fail2Ban is installed to automatically block IP addresses that exhibit malicious behavior.
 
-### Backup Issues
+  * **SSH Protection:** A `jail` is configured to monitor the custom SSH port. After a set number of failed login attempts (`maxretry = 5`), the offending IP is banned for a specified time (`bantime = 1d`).
+  * **UFW Log Monitoring:** The script adds a custom Fail2Ban filter and jail named `ufw-probes`. This monitors `/var/log/ufw.log` for blocked connection attempts (e.g., from port scans) and bans the source IPs, providing proactive protection against scanners.
+  * **Configuration:** All Fail2Ban settings are written to `/etc/fail2ban/jail.local` to ensure they persist across updates.
 
-If backups fail:
+#### **Automated Security Updates**
 
-1.  **Verify SSH Key**:
-      * Check: `sudo cat /root/.ssh/id_ed25519.pub`
-      * Copy (if needed): `sudo ssh-copy-id -p <backup_port> -s <backup_user@backup_host>`
-      * For Hetzner: `sudo ssh -p 23 <backup_user@backup_host> "mkdir -p ~/.ssh && chmod 700 ~/.ssh"`
-      * Test SSH: `sudo ssh -p <backup_port> <backup_user@backup_host> exit`
-2.  **Check Logs**:
-      * Review: `sudo less /var/log/backup_rsync.log`
-      * If automated key copy fails: `cat /tmp/ssh-copy-id.log`
-3.  **Test Backup Manually**:
-    ```
-    sudo /root/run_backup.sh
-    ```
-4.  **Verify Cron Job**:
-      * Check: `sudo crontab -l`
-      * Ensure: `5 3 * * * /root/run_backup.sh #-*- managed by setup_harden script -*-`
-      * Test cron permissions: `echo "5 3 * * * /root/run_backup.sh" | crontab -u root -`
-      * Check permissions: `ls -l /var/spool/cron/crontabs/root` (expect `-rw------- root:crontab`)
-5.  **Network Issues**:
-      * Verify port: `nc -zv <backup_host> <backup_port>`
-      * Check VPS firewall for outbound access to the backup port (e.g., 23 for Hetzner).
-6.  **Summary Errors**:
-      * If summary shows `Remote Backup: Not configured`, verify: `ls -l /root/run_backup.sh`
+To ensure the server remains secure over time, the script configures `unattended-upgrades`. This service will automatically download and install security-related package updates in the background.
 
-### Security Audit Issues
+#### **System Stability**
 
-If audits fail:
+  * **Time Synchronization:** The `chrony` service is installed and enabled to keep the system's time accurate by synchronizing with NTP servers.
+  * **Swap File:** For systems with low RAM, the script can create a swap file. You are prompted for the desired size (e.g., 2G). It also tunes system `swappiness` and `vfs_cache_pressure` settings for better performance on servers.
 
-1.  **Check Audit Log**:
-      * Review: `sudo less /var/log/setup_harden_security_audit_*.log`
-      * Look for Lynis errors or debsecan CVE reports
-2.  **Verify Installation**:
-      * Lynis: `command -v lynis`
-      * Debsecan: `command -v debsecan`
-      * Reinstall if needed: `sudo apt-get install lynis debsecan`
-3.  **Run Manually**:
-      * Lynis: `sudo lynis audit system --quick`
-      * Debsecan: `sudo debsecan --suite $(source /etc/os-release && echo $VERSION_CODENAME)`
+#### **Remote `rsync` Backups**
 
-### Tailscale Issues
+The script can configure automated daily backups to any remote server accessible via SSH.
 
-If Tailscale fails to connect:
+  * **SSH Key for Root:** It generates a dedicated SSH key for the `root` user, stored at `/root/.ssh/id_ed25519`, which will be used for the backup job.
+  * **Destination & Scheduling:** You are prompted for the remote server's details (user, host, port) and the desired cron schedule for the backup.
+  * **SSH Key Transfer:** You can choose to copy the SSH key automatically using `sshpass` (less secure, requires a password) or manually via `ssh-copy-id` (recommended). For Hetzner Storage Boxes, it correctly uses the `-s` flag and port 23.
+  * **Backup Script:** A self-contained backup script is created at `/root/run_backup.sh`. This script handles the `rsync` process, logging, and notifications.
+  * **Notifications:** You can optionally configure notifications for backup success or failure via **ntfy** or a **Discord webhook**.
+  * **Exclusions:** A default exclude file is created at `/root/rsync_exclude.txt` to prevent backing up unnecessary files like caches and logs. You can add your own exclusions.
 
-1.  **Verify Installation**:
-      * Check: `command -v tailscale`
-      * Service status: `sudo systemctl status tailscaled`
-2.  **Check Connection**:
-      * Run: `tailscale status`
-      * Verify server: `tailscale status --json | grep ControlURL`
-      * Check logs: `sudo journalctl -u tailscaled`
-3.  **Test Pre-Auth Key**:
-      * Re-run the command shown in the script output (e.g., `sudo tailscale up --auth-key=<key> --operator=<username>` or with `--login-server=<url>`).
-      * For custom servers, ensure the key is valid for the specified server (e.g., generated from `https://ts.mydomain.cloud`).
-4.  **Additional Flags**:
-      * Verify SSH: `tailscale ssh <username>@<tailscale-ip>`
-      * Check exit node: Tailscale admin console
-      * Verify DNS: `cat /etc/resolv.conf`
-      * Check routes: `tailscale status`
-5.  **Network Issues**:
-      * Ensure UDP 41641 is open: `nc -zvu <tailscale-server> 41641`
-      * Check VPS firewall for Tailscale traffic.
+#### **Backup Testing**
 
-## [MIT](https://github.com/buildplan/du_setup/blob/main/LICENSE) License
+After configuring remote backups, the script offers to run a test backup. It creates a temporary file and attempts to `rsync` it to the destination, verifying that the SSH key, path, and permissions are all correct before the first scheduled backup runs. The result is logged to `/var/log/backup_rsync.log`.
 
-This script is open-source and provided "as is" without warranty. Use at your own risk.
+#### **Tailscale VPN**
+
+The script can install and configure Tailscale.
+
+  * **Installation:** It uses the official `install.sh` script from Tailscale.
+  * **Connection:** You are prompted to provide a pre-auth key to connect the node to your tailnet. It supports both the standard Tailscale service and custom servers (like Headscale). The new node is associated with the admin user you created (`--operator=$USERNAME`).
+  * **Optional Flags:** You can enable additional features like `--ssh`, `--advertise-exit-node`, `--accept-dns`, and `--accept-routes` through an interactive menu.
+
+#### **Security Auditing**
+
+For a deeper security analysis, the script can run two auditing tools.
+
+  * **Lynis:** If selected, `lynis` is installed and runs a system audit. The results, including the final "Hardening Index," are saved to a log file for later review.
+  * **debsecan:** On Debian systems, you can also run `debsecan` to check for known vulnerabilities (CVEs) in the installed packages.
+
+-----
+
+### **Logs and Configuration Backups**
+
+  * **Main Log File:** All actions performed by the script are logged to `/var/log/du_setup_*.log`.
+  * **Configuration Backups:** Before any modifications are made, original configuration files are backed up into `/root/setup_harden_backup_*`.
+  * **Backup Log:** The output of all remote backup jobs (both test and scheduled) is logged to `/var/log/backup_rsync.log`.
+  * **Audit Log:** The results from Lynis and debsecan are stored in `/var/log/setup_harden_security_audit_*.log`.
+
+-----
+
+### **Post-Installation and Verification**
+
+After the script finishes, a reboot is required to ensure all changes are applied. You should then verify that all services are working correctly. A detailed list of verification commands is provided in the final summary output.
+
+-----
+
+### **Troubleshooting**
+
+The `README.md` provides detailed, step-by-step instructions for recovering from common issues.
+
+  * **SSH Lockout:** Use your cloud provider's web console to restore the original SSH configuration from the backup directory.
+  * **Backup Issues:** Check logs, verify the root SSH key was copied correctly, test the connection manually, and check the cron job syntax.
+  * **Tailscale Issues:** Verify the service status, check for a valid IP address, re-run the `tailscale up` command, and check for network blocks (UDP 41641).
