@@ -1,4 +1,10 @@
-
+---
+layout: default
+title: Container Monitor
+nav_order: 9
+parent: Home
+last_modified_date: 2025-08-11T09:30:43+01:00
+---
 
 # Automated `rsync` Backup Script
 
