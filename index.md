@@ -34,3 +34,7 @@ Some of the project documentation for:
 
 * ### [**Container Monitor**](./container-monitor/getting-started.md)
     Container Monitor is a Bash script for monitoring Docker containers. It automates checks for container health, resource usage, and available image updates, and can send notifications if it finds any issues.
+
+
+* ### [**`rsync` Backup Script**](./rsync-backup-script/getting-started.md)
+    Bash script for automating secure, efficient backups to any remote server over SSH/rsync.
