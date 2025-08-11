@@ -8,7 +8,7 @@ last_modified_date: 2025-08-11T09:30:43+01:00
 
 # Automated `rsync` Backup Script
 
-A robust, production-ready Bash script for automating secure, efficient backups to any remote server over SSH. It is designed for system administrators and developers who need a reliable, configurable, and observable backup solution that can be deployed easily and managed via a single configuration file.
+A robust Bash script for automating secure, efficient backups to any remote server over SSH. It is designed for my peronal use and I use Hetzner Storage Box but can be adopted to use with any other remote backup solution. it's a reliable, configurable, and observable backup solution that can be deployed easily and managed via a single configuration file.
 
 The script leverages `rsync` for its powerful differential backup capabilities and wraps it in a layer of security, error handling, logging, and notification features suitable for any production environment.
 
