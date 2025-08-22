@@ -2,7 +2,7 @@
 layout: default
 title: Home
 nav_order: 1
-last_modified_date: 2025-07-14T17:20:27+01:00
+last_modified_date: 2025-08-22T10:10:58+01:00
 ---
 
 # **buildplan Project Documentation!**
@@ -37,3 +37,6 @@ Some of the project documentation for:
 
 * ### [**`rsync` Backup Script**](./rsync-backup-script/getting-started.md)
     Bash script for automating secure, efficient backups to any remote server over SSH/rsync.
+
+* ### [**Private Registry Setup**](./private_registry_setup/getting-started.md)
+    This documentation serves as both operational manual and disaster recovery guide. It's comprehensive enough to configure and maintain registry setup, while providing the technical depth needed for troubleshooting and expansion.
