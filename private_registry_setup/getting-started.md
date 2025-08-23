@@ -3,7 +3,7 @@ layout: default
 title: Private Docker Registry Setup
 nav_order: 10
 parent: Home
-last_modified_date: 2025-08-22T11:25:00+01:00
+last_modified_date: 2025-08-23T09:25:00+01:00
 ---
 
 # Private Docker Registry Setup Documentation
