@@ -908,3 +908,77 @@ Regular maintenance following the procedures outlined in this documentation will
 
 *Documentation last updated: August 23, 2025*  
 *Based on: Docker Registry v3, Debian 13, Docker Compose*
+
+<a id="back-to-top"></a>
+
+<style>
+  /* Enable smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Style for the back-to-top button */
+  #back-to-top {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stick to the screen */
+    bottom: 30px; /* Position from the bottom */
+    right: 30px; /* Position from the right */
+    z-index: 99; /* Stay on top of other content */
+    
+    /* Button appearance */
+    font-size: 18px;
+    border: none;
+    outline: none;
+    background-color: #007bff; /* A nice blue color */
+    color: white;
+    cursor: pointer;
+    padding: 15px;
+    border-radius: 50%; /* Make it a circle */
+    width: 50px;
+    height: 50px;
+    
+    /* Centering the arrow */
+    text-align: center;
+    line-height: 20px;
+    
+    /* Smooth transition for appearing/disappearing */
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s;
+    visibility: hidden;
+  }
+  
+  /* Add an arrow inside the button */
+  #back-to-top::before {
+    content: '↑';
+  }
+
+  #back-to-top:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+  }
+  
+  /* Style for when the button is visible */
+  #back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+  }
+</style>
+
+<script>
+  // Get the button element
+  const backToTopButton = document.getElementById('back-to-top');
+
+  // When the user scrolls down 200px from the top, show the button
+  window.onscroll = function() {
+    if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+      backToTopButton.classList.add('show');
+    } else {
+      backToTopButton.classList.remove('show');
+    }
+  };
+
+  // When the user clicks the button, scroll to the top
+  backToTopButton.onclick = function(e) {
+      e.preventDefault(); // Prevent the default anchor behavior
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+</script>
