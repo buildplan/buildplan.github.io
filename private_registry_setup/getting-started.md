@@ -906,5 +906,5 @@ Regular maintenance following the procedures outlined in this documentation will
 
 ---
 
-*Documentation last updated: August 22, 2025*  
+*Documentation last updated: August 23, 2025*  
 *Based on: Docker Registry v3, Debian 13, Docker Compose*
