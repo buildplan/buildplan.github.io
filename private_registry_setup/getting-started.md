@@ -919,7 +919,6 @@ Regular maintenance following the procedures outlined in this documentation will
 
   /* Style for the back-to-top button */
   #back-to-top {
-    display: none; /* Hidden by default */
     position: fixed; /* Stick to the screen */
     bottom: 30px; /* Position from the bottom */
     right: 30px; /* Position from the right */
