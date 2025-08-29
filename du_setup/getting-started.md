@@ -337,8 +337,6 @@ Below is an example walkthrough to show how script will behave when run on a fre
 - **Script Version**: v0.52 (walkthrough was created at v0.52 but still valid)
 - **Execution Mode**: Interactive (not `--quiet`), to capture user prompts and verify decision points.
 
----
-
 ### **Walkthrough**
 
 #### **1. Preparation**
