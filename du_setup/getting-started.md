@@ -19,15 +19,14 @@ last_modified_date: 2025-08-29T18:30:00+01:00
 5. [Detailed Features & Walkthrough](#detailed-feature-explanations)
    - [Feature Explanations](#detailed-feature-explanations)
    - [Example Walkthrough](#detailed-feature-walkthrough)
-6. [Detailed Feature Walkthrough](#detailed-feature-walkthrough)
-7. [Security Features](#security-features)
-8. [Logging & Backup System](#logging--backup-system)
-9. [Post-Installation Verification](#post-installation-verification)
-10. [Advanced Configuration](#advanced-configuration)
-11. [Troubleshooting Guide](#troubleshooting-guide)
-12. [Best Practices](#best-practices)
-13. [FAQ](#faq)
-14. [Additional Resources](#additional-resources)
+6. [Security Features](#security-features)
+7. [Logging & Backup System](#logging--backup-system)
+8. [Post-Installation Verification](#post-installation-verification)
+9. [Advanced Configuration](#advanced-configuration)
+10. [Troubleshooting Guide](#troubleshooting-guide)
+11. [Best Practices](#best-practices)
+12. [FAQ](#faq)
+13. [Additional Resources](#additional-resources)
 
 ---
 
