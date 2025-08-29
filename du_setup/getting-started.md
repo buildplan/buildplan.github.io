@@ -16,18 +16,17 @@ last_modified_date: 2025-08-29T16:30:00+01:00
 2. [Compatibility & Requirements](#compatibility--requirements)
 3. [Feature summary](#feature-summary)
 4. [Installation & Usage](#installation--usage)
-5. [Core Features & Components](#core-features--components)
-6. [Detailed feature explanations](#detailed-feature-explanations)
-7. [Security features: defense in depth](#security-features-defense-in-depth)
-8. [Detailed Feature Walkthrough](#detailed-feature-walkthrough)
-9. [Security Features](#security-features)
-10. [Logging & Backup System](#logging--backup-system)
-11. [Post-Installation Verification](#post-installation-verification)
-12. [Advanced Configuration](#advanced-configuration)
-13. [Troubleshooting Guide](#troubleshooting-guide)
-14. [Best Practices](#best-practices)
-15. [FAQ](#faq)
-16. [Additional Resources](#additional-resources)
+5. [Detailed feature explanations](#detailed-feature-explanations)
+6. [Security features: defense in depth](#security-features-defense-in-depth)
+7. [Detailed Feature Walkthrough](#detailed-feature-walkthrough)
+8. [Security Features](#security-features)
+9. [Logging & Backup System](#logging--backup-system)
+10. [Post-Installation Verification](#post-installation-verification)
+11. [Advanced Configuration](#advanced-configuration)
+12. [Troubleshooting Guide](#troubleshooting-guide)
+13. [Best Practices](#best-practices)
+14. [FAQ](#faq)
+15. [Additional Resources](#additional-resources)
 
 ---
 
@@ -187,33 +186,9 @@ The script follows this general flow:
 5. **Optional Components** - Docker, Tailscale, backups, etc.
 6. **Final Verification** - Tests configuration and generates report
 
----
-
-## Core Features & Components
-
-### Essential Security Components
-
-| Component | Description | Status |
-|---|---|---|
-| **User Management** | Creates secure sudo user, disables root SSH | Always Applied |
-| **SSH Hardening** | Custom port, key-only auth, security banner | Always Applied |
-| **Firewall (UFW)** | Configured with secure defaults | Always Applied |
-| **Fail2Ban** | Intrusion prevention system | Always Applied |
-| **Auto Updates** | Unattended security patches | Optional |
-| **Time Sync** | Chrony NTP synchronization | Always Applied |
-
-### System Enhancement Components
-
-| Component | Description | Status |
-|---|---|---|
-| **Kernel Hardening** | Sysctl security parameters | Optional |
-| **Swap Configuration** | Optimized virtual memory | Optional |
-| **Docker & Compose** | Container runtime platform | Optional |
-| **Tailscale VPN** | Mesh networking solution | Optional |
-| **Remote Backups** | Automated rsync over SSH | Optional |
-| **Security Auditing** | Lynis & debsecan analysis | Optional |
 
 ---
+
 
 ## Detailed feature explanations
 
