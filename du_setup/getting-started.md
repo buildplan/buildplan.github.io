@@ -17,16 +17,15 @@ last_modified_date: 2025-08-29T16:30:00+01:00
 3. [Feature summary](#feature-summary)
 4. [Installation & Usage](#installation--usage)
 5. [Detailed feature explanations](#detailed-feature-explanations)
-6. [Security features: defense in depth](#security-features-defense-in-depth)
-7. [Detailed Feature Walkthrough](#detailed-feature-walkthrough)
-8. [Security Features](#security-features)
-9. [Logging & Backup System](#logging--backup-system)
-10. [Post-Installation Verification](#post-installation-verification)
-11. [Advanced Configuration](#advanced-configuration)
-12. [Troubleshooting Guide](#troubleshooting-guide)
-13. [Best Practices](#best-practices)
-14. [FAQ](#faq)
-15. [Additional Resources](#additional-resources)
+6. [Detailed Feature Walkthrough](#detailed-feature-walkthrough)
+7. [Security Features](#security-features)
+8. [Logging & Backup System](#logging--backup-system)
+9. [Post-Installation Verification](#post-installation-verification)
+10. [Advanced Configuration](#advanced-configuration)
+11. [Troubleshooting Guide](#troubleshooting-guide)
+12. [Best Practices](#best-practices)
+13. [FAQ](#faq)
+14. [Additional Resources](#additional-resources)
 
 ---
 
@@ -320,13 +319,6 @@ Resizing options and safe skips prevent destructive operations on existing swap 
 Lynis audits produce a hardening index and actionable suggestions, saved under /var/log/setup_harden_security_audit_*.log and summarized in the script report for ongoing tracking.
 Debian systems can also run debsecan to map installed packages to known CVEs, with severity information included for remediation planning and visibility.
 Audit outputs are preserved and integrated into the logging/reporting framework to support compliance, change control, and continuous improvement cycles.
-
-## Security features: defense in depth
-
-- Access control: Key-based SSH, disabled root login, privilege separation with sudo.
-- Network security: UFW with stateful filtering, Fail2Ban for dynamic blocking, and connection rate limits via service configurations.
-- System hardening: Sysctl hardening (network/ASLR/ptrace/dmesg/link protections) to reduce exploitability and lateral movement.
-- Monitoring \& updates: Automated security patching option, periodic audits, and comprehensive logging for forensics and incident response.
 
 ---
 
