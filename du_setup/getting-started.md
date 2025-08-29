@@ -39,7 +39,7 @@ last_modified_date: 2025-08-29T16:30:00+01:00
 
 ---
 
-## Overview \& goals
+## Overview & Goals
 
 The du_setup script automates secure initialization and hardening of fresh Debian and Ubuntu servers, emphasizing idempotence, safety-first changes, and audit-ready logging to produce a production-grade baseline quickly and consistently.
 It creates a secure admin account, hardens SSH, enables a restrictive firewall, configures Fail2Ban, time sync, optional kernel hardening, and installs optional components like Docker, Tailscale, and a fully featured backup system with repeatable validations.
