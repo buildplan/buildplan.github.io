@@ -16,7 +16,9 @@ last_modified_date: 2025-08-29T18:30:00+01:00
 2. [Compatibility & Requirements](#compatibility--requirements)
 3. [Feature summary](#feature-summary)
 4. [Installation & Usage](#installation--usage)
-5. [Detailed feature explanations](#detailed-feature-explanations)
+5. [Detailed Features & Walkthrough](#detailed-feature-explanations)
+   - [Feature Explanations](#detailed-feature-explanations)
+   - [Example Walkthrough](#detailed-feature-walkthrough)
 6. [Detailed Feature Walkthrough](#detailed-feature-walkthrough)
 7. [Security Features](#security-features)
 8. [Logging & Backup System](#logging--backup-system)
@@ -324,13 +326,15 @@ Audit outputs are preserved and integrated into the logging/reporting framework 
 
 ## Detailed Feature Walkthrough
 
-### **Setup**
-- **Environment**: A fresh VM running **Ubuntu 22.04 LTS** (a supported OS) with:
+Below is an example walkthrough to show how script will behave when run on a freash VM or VPS.
+
+### **Setup for Walkthrough**
+- **Environment**: A fresh VM running **Debian 12 LTS** (a supported OS) with:
   - Root privileges (`sudo` or direct root access).
   - Internet connectivity (for package downloads and Tailscale).
   - At least 2GB free disk space (for swap and temporary files).
   - Minimal installation (no prior SSH hardening, UFW, or Fail2Ban configured).
-- **Script Version**: v0.52
+- **Script Version**: v0.52 (walkthrough was created at v0.52 but still valid)
 - **Execution Mode**: Interactive (not `--quiet`), to capture user prompts and verify decision points.
 
 ---
