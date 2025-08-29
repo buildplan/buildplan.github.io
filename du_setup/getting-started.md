@@ -8,14 +8,6 @@ last_modified_date: 2025-08-29T16:30:00+01:00
 
 # Debian & Ubuntu Server Setup & Hardening Script
 
-[![Debian](https://img.shields.io/badge/Compatibility–Debian%2012%7C13-%23A81D33?style=flat&labelColor=555&logo=debian&logoColor=white)](https://www.debian.org/releases/)
-[![Ubuntu](https://img.shields.io/badge/Compatibility–Ubuntu%2022.04%7C24.04-%23E95420?style=flat&labelColor=555&logo=ubuntu&logoColor=white)](https://ubuntu.com/download/server)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-**Version:** v0.66  
-**Last Updated:** 2025-08-26  
-**GitHub Repository:** [https://github.com/buildplan/du_setup](https://github.com/buildplan/du_setup)
-
 ---
 
 ## Table of Contents
