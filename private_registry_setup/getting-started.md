@@ -8,6 +8,8 @@ last_modified_date: 2025-08-23T09:25:00+01:00
 
 # Private Docker Registry Setup Documentation
 
+---
+
 ## Table of Contents
 1. [Overview](#overview)
 2. [Architecture](#architecture)
