@@ -3,7 +3,7 @@ layout: default
 title: du_setup
 nav_order: 3
 parent: Home
-last_modified_date: 2025-08-29T16:30:00+01:00
+last_modified_date: 2025-08-29T18:30:00+01:00
 ---
 
 # Debian & Ubuntu Server Setup & Hardening Script
@@ -1418,4 +1418,5 @@ Add custom jail configurations to `/etc/fail2ban/jail.local` and restart the ser
 *This documentation is maintained alongside the du_setup script. For the most current version, always refer to the [GitHub](https://github.com/buildplan/du_setup) repository.*
 
 **License**: [MIT License](https://github.com/buildplan/du_setup/blob/main/LICENSE)
+
 **Disclaimer**: This script is provided "as is" without warranty. Use at your own risk and always test in non-production environments first.
