@@ -116,11 +116,11 @@ The script has been extensively tested on:
 | :-- | :-- | :-- |
 | Automatic security updates | unattended-upgrades, conservative policies | Continuous patching |
 | Kernel hardening | sysctl parameters for network and process security | Attack resistance |
-| Docker \& Compose | Runtime and Compose plugin, group membership, hello-world test | Containerization |
+| Docker & Compose | Runtime and Compose plugin, group membership, hello-world test | Containerization |
 | Tailscale VPN | Official installation, keys, exit node, SSH, custom servers | Zero-trust overlay |
 | Automated backups | rsync-over-SSH with locking, logs, notifications, cron | Data protection |
 | Swap file | Creation, tuning, fstab integration | Stability under pressure |
-| Security auditing | Lynis and debsecan (Debian) with reports | Visibility \& compliance |
+| Security auditing | Lynis and debsecan (Debian) with reports | Visibility & compliance |
 
 ---
 
@@ -198,7 +198,7 @@ Privilege verification enforces root execution, verifies compatible Debian/Ubunt
 SSH daemon availability is checked and noted for service unit names (ssh.service, sshd.service, ssh.socket) to support OS differences and socket activation behavior.
 If unsupported versions are detected, a warning and operator confirmation gate allow opting into best-effort execution with logged caveats.
 
-### Dependency \& update management
+### Dependency & update management
 
 The script updates package indexes, installs essentials (curl, sudo, gpg, and SSH components), and performs non-interactive upgrades to ensure a secure baseline before further changes.
 All installations use non-interactive flags to prevent stalls in automation and to keep deterministic behavior across runs and environments.
@@ -282,7 +282,7 @@ A comprehensive set of network and system parameters is applied via /etc/sysctl.
 Where IPv6 is in use, redirect and source-route protections are applied similarly to strengthen host posture across dual-stack deployments.
 The script checks for idempotence and only updates the sysctl file if contents differ to avoid unnecessary reloads while ensuring persistence across reboots.
 
-### Docker \& Compose (optional)
+### Docker & Compose (optional)
 
 The script configures Docker’s official repository and installs Docker Engine, the Compose plugin, and dependencies, removing obsolete runtimes to avoid conflicts.
 The admin user is added to the docker group, with a hello-world container run to verify installation and permissions, and a note to re-login for group membership to take effect.
@@ -1400,7 +1400,6 @@ Add custom jail configurations to `/etc/fail2ban/jail.local` and restart the ser
 ### Documentation Links
 - **GitHub Repository**: [https://github.com/buildplan/du_setup](https://github.com/buildplan/du_setup)
 - **Issue Tracker**: [https://github.com/buildplan/du_setup/issues](https://github.com/buildplan/du_setup/issues)
-- **Security Advisories**: Check repository security tab
 
 ### External References
 - **Ubuntu Server Documentation**: [https://ubuntu.com/server/docs](https://ubuntu.com/server/docs)
@@ -1408,6 +1407,14 @@ Add custom jail configurations to `/etc/fail2ban/jail.local` and restart the ser
 - **SSH Hardening Guide**: [https://www.sshaudit.com/hardening_guides.html](https://www.sshaudit.com/hardening_guides.html)
 - **UFW Documentation**: [https://help.ubuntu.com/community/UFW](https://help.ubuntu.com/community/UFW)
 - **Fail2Ban Manual**: [https://www.fail2ban.org/wiki/index.php/Main_Page](https://www.fail2ban.org/wiki/index.php/Main_Page)
+- **Debian unattended-upgrades**: [https://wiki.debian.org/PeriodicUpdates?action=show&redirect=UnattendedUpgrades](https://wiki.debian.org/PeriodicUpdates?action=show&redirect=UnattendedUpgrades)
+- **`sysctl` Manual (kernel parameters)**: [https://manpages.debian.org/trixie/procps/sysctl.8.en.html](https://manpages.debian.org/trixie/procps/sysctl.8.en.html)
+- **Docker Documentation**: [https://docs.docker.com/manuals/](https://docs.docker.com/manuals/)
+- **Tailscale Documentation**: [https://tailscale.com/kb](https://tailscale.com/kb)
+- **`rsync` Manual**: [https://man.archlinux.org/man/rsync.1](https://man.archlinux.org/man/rsync.1)
+- **`swapon` Manual**: [https://man.archlinux.org/man/swapon.8](https://man.archlinux.org/man/swapon.8)
+- **`debsecan` Manual**: [https://manpages.debian.org/trixie/debsecan/debsecan.1.en.html](https://manpages.debian.org/trixie/debsecan/debsecan.1.en.html)
+- **Lynis Documentation**: [https://cisofy.com/lynis/](https://cisofy.com/lynis/)
 
 ### Community & Support
 - **GitHub Discussions**: Use for questions and feature requests
