@@ -3,7 +3,7 @@ layout: default
 title: Private Docker Registry Setup
 nav_order: 10
 parent: Home
-last_modified_date: 2025-08-23T09:25:00+01:00
+last_modified_date: 2025-08-31T18:03:00+01:00
 ---
 
 # Private Docker Registry Setup Documentation
@@ -400,7 +400,7 @@ registry.my_domain.tld {
 
 ### check_sync.sh - Regsync Automation
 **Purpose**: Automated image synchronization with state management  
-**Source**: [GitHub Repository](https://github.com/buildplan/docker/blob/main/private-registry-stack/check_and_sync.sh)
+**Source**: [GitHub Repository](https://github.com/buildplan/docker/raw/refs/heads/main/private-registry-stack/check_sync.sh)
 
 **Key Features**:
 - State-aware execution (6-hour minimum interval)
@@ -429,7 +429,7 @@ registry.my_domain.tld {
 
 ### run_backup.sh - Backup Automation
 **Purpose**: Consistent backup to Hetzner Storage Box  
-**Source**: [GitHub Repository](https://github.com/buildplan/docker/blob/main/private-registry-stack/backup_home_to_hetzner.sh)
+**Source**: [GitHub Repository](https://github.com/buildplan/docker/raw/refs/heads/main/private-registry-stack/run_backup.sh)
 
 **Key Features**:
 - Service coordination (stops registry during backup for consistency)
@@ -454,7 +454,8 @@ sudo ./run_backup.sh
 ```
 
 ### run_gc.sh - Garbage Collection
-**Purpose**: Registry cleanup and space management
+**Purpose**: Registry cleanup and space management  
+**Source**: [GitHub Repository](https://github.com/buildplan/docker/raw/refs/heads/main/private-registry-stack/run_gc.sh)
 
 **Process**:
 1. Stop registry service to prevent writes during GC
@@ -468,7 +469,8 @@ sudo ./run_backup.sh
 ```
 
 ### check_changes.sh - Change Detection
-**Purpose**: Monitor registry content changes
+**Purpose**: Monitor registry content changes  
+**Source**: [GitHub Repository](https://github.com/buildplan/docker/raw/refs/heads/main/private-registry-stack/check_changes.sh)
 
 **Features**:
 - Uses regctl for repository listing
@@ -477,7 +479,8 @@ sudo ./run_backup.sh
 - State file management for persistent tracking
 
 ### manage_regsync.sh - Interactive Management
-**Purpose**: User-friendly regsync configuration management
+**Purpose**: User-friendly regsync configuration management  
+**Source**: [GitHub Repository](https://github.com/buildplan/docker/raw/refs/heads/main/private-registry-stack/manage_regsync.sh)
 
 **Features**:
 - Interactive menu system with color-coded output
@@ -888,8 +891,10 @@ docker compose exec redis redis-cli info
 
 ### Source Code
 - **Main Scripts Repository**: [https://github.com/buildplan/docker/tree/main/private-registry-stack](https://github.com/buildplan/docker/tree/main/private-registry-stack)
-- **Sync Automation Script**: [https://github.com/buildplan/docker/blob/main/private-registry-stack/check_and_sync.sh](https://github.com/buildplan/docker/blob/main/private-registry-stack/check_and_sync.sh)
-- **Backup Script**: [https://github.com/buildplan/docker/blob/main/private-registry-stack/backup_home_to_hetzner.sh](https://github.com/buildplan/docker/blob/main/private-registry-stack/backup_home_to_hetzner.sh)
+- **Sync Automation Script**: [https://github.com/buildplan/docker/raw/refs/heads/main/private-registry-stack/check_sync.sh](https://github.com/buildplan/docker/raw/refs/heads/main/private-registry-stack/check_sync.sh)
+- **Backup Script**: [https://github.com/buildplan/docker/raw/refs/heads/main/private-registry-stack/run_backup.sh](https://github.com/buildplan/docker/raw/refs/heads/main/private-registry-stack/run_backup.sh)
+- **Garbage Cleaning Script**: [https://github.com/buildplan/docker/raw/refs/heads/main/private-registry-stack/run_gc.sh](https://github.com/buildplan/docker/raw/refs/heads/main/private-registry-stack/run_gc.sh)
+- **Check Registry Changes Script**: [https://github.com/buildplan/docker/raw/refs/heads/main/private-registry-stack/check_changes.sh](https://github.com/buildplan/docker/raw/refs/heads/main/private-registry-stack/check_changes.sh)
 
 ### Troubleshooting Resources
 - **Registry Health Checks**: [https://github.com/distribution/distribution/issues/629](https://github.com/distribution/distribution/issues/629)
