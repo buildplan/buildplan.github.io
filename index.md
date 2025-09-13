@@ -2,7 +2,7 @@
 layout: default
 title: Home
 nav_order: 1
-last_modified_date: 2025-08-22T10:10:58+01:00
+last_modified_date: 2025-09-13T10:18:58+01:00
 ---
 
 # **buildplan Project Documentation!**
@@ -40,3 +40,6 @@ Some of the project documentation for:
 
 * ### [**Private Registry Setup**](./private_registry_setup/getting-started.md)
     This documentation serves as both operational manual and disaster recovery guide. It's comprehensive enough to configure and maintain registry setup, while providing the technical depth needed for troubleshooting and expansion.
+
+* ### [**Forgejo Setup**](./forgejo/getting-started.md)
+    This guide documents a setup for a self-hosted Forgejo Git service with an integrated CI/CD runner.
