@@ -2,7 +2,7 @@
 layout: default
 title: Home
 nav_order: 1
-last_modified_date: 2025-09-13T10:18:58+01:00
+last_modified_date: 2025-09-13T10:21:58+01:00
 ---
 
 # **buildplan Project Documentation!**
@@ -43,3 +43,6 @@ Some of the project documentation for:
 
 * ### [**Forgejo Setup**](./forgejo/getting-started.md)
     This guide documents a setup for a self-hosted Forgejo Git service with an integrated CI/CD runner.
+
+* ### [**Restic Backup Script**](./restic-backup-script/getting-started.md)
+    Encrypted, automated backups with `restic` - This guide provides a walkthrough for installing, configuring, and operating automated backup system on Linux using `restic`.
