@@ -85,7 +85,7 @@ nano docker-compose.yaml
 
 Change the `firefox-syncserver` service **from** this:
 
-```YAML
+```
 firefox-syncserver:
   build:
     context: ./app
@@ -94,7 +94,7 @@ firefox-syncserver:
 
 **To** this (using the pre-built image):
 
-```YAML
+```
 firefox-syncserver:
   image: ghcr.io/dan-r/syncstorage-rs-docker:main
 ```
@@ -105,7 +105,7 @@ To prevent logs from consuming all your disk space, add a `logging` section to b
 
 **Complete docker-compose.yaml should look like this:**
 
-```YAML
+```
 services:
   firefox-mariadb:
     container_name: firefox-mariadb
