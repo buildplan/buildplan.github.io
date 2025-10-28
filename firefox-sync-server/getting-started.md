@@ -257,26 +257,12 @@ This is the most important step.
 
 #### Mobile (Android)
 
-- **Method 1: Firefox Nightly or Beta (Easiest)**
-
-    1.  Install Firefox Nightly or Beta.
-    2.  Go to **Settings** → **About Firefox Nightly**.
-    3.  Tap the Firefox logo 5 times to unlock developer options.
-    4.  Go back to **Settings** → **Custom Sync Server**.
-    5.  Enter your URL: `https://sync.yourdomain.com/1.0/sync/1.5`
-    6.  Sign into your Firefox Account.
-
-- **Method 2: Regular Firefox (Advanced)**
-
-    1.  Requires root or `adb` to access the profile directory.
-    2.  Create a file named `user.js` inside your profile directory.
-    3.  Add this line:
-
-        ```JavaScript
-        user_pref("identity.sync.tokenserver.uri", "https://sync.yourdomain.com/1.0/sync/1.5");
-        ```
-
-    4.  Force-stop Firefox, re-open it, and sign in.
+1.  Install Firefox.
+2.  Go to **Settings** → **About Firefox**.
+3.  Tap the Firefox logo 5 times to unlock developer options.
+4.  Go back to **Settings** → **Sync Debug**.
+5.  Enter your URL: `https://sync.yourdomain.com/1.0/sync/1.5`
+6.  Sign into your Firefox Account.
 
 ### Mobile (iOS)
 
