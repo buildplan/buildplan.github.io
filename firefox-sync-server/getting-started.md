@@ -191,7 +191,7 @@ Your sync server is running on `http://localhost:8000`. You **must** expose it s
 
 This is a secure, production-ready config.
 
-```Nginx
+```
 # Define rate limiting zone
 limit_req_zone $binary_remote_addr zone=sync:10m rate=10r/s;
 
