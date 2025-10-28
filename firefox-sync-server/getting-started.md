@@ -21,7 +21,7 @@ This method **only stores your sync data** (bookmarks, passwords, history, etc.)
 - A **reverse proxy** (like Nginx, Traefik, Caddy, or Pangolin) to handle HTTPS.
 - A valid **SSL certificate** (e.g., from Let's Encrypt) configured in your reverse proxy.
 
-* * *
+-----
 
 ## 🛠️ Installation Steps
 
@@ -90,7 +90,6 @@ firefox-syncserver:
   build:
     context: ./app
     dockerfile: Dockerfile
-  # ...
 ```
 
 **To** this (using the pre-built image):
@@ -98,7 +97,6 @@ firefox-syncserver:
 ```YAML
 firefox-syncserver:
   image: ghcr.io/dan-r/syncstorage-rs-docker:main
-  # ...
 ```
 
 ### 4. Add Logging Configuration (Optional, Recommended)
@@ -183,7 +181,7 @@ Wait until you see:
 - `firefox-mariadb` | `[ls.io-init] done.`
 - `firefox-syncserver` | `Server running on http://0.0.0.0:8000`
 
-* * *
+-----
 
 ## 🔄 Reverse Proxy Configuration
 
@@ -237,7 +235,7 @@ server {
     - **CRITICAL:** Do **NOT** enable any authentication (OIDC, Basic Auth, etc.).
 4.  Add **Security Headers** & **Rate Limiting** **Geo-blocking** as needed.
 
-* * *
+-----
 
 ### 🦊 Firefox Client Configuration
 
@@ -284,7 +282,7 @@ This is the most important step.
 
 **Not supported.** Firefox for iOS does not allow changing the sync server.
 
-* * *
+-----
 
 ### ✅ Verification and Testing
 
@@ -321,7 +319,7 @@ This is the most important step.
 
     - On Desktop: **Settings** → **Sync** → Click **"Sync now"**.
 
-* * *
+-----
 
 ### 📈 What Success Looks Like
 
@@ -335,7 +333,7 @@ After you've signed into Firefox on one or two devices, here's how you know it's
     docker exec firefox-mariadb mariadb -u sync -p$(grep MYSQL_PASSWORD .env | cut -d'=' -f2) -e "SELECT COUNT(*) FROM syncstorage_rs.bso;"
     ```
 
-* * *
+-----
 
 ## 🚑 Troubleshooting
 
@@ -361,7 +359,7 @@ After you've signed into Firefox on one or two devices, here's how you know it's
 
     - **This is normal.** This table is for metadata. The *actual* data is stored in the `bso` table. Check its count instead (see verification step).
 
-* * *
+-----
 
 ## 🔧 Maintenance & Quick Commands
 
