@@ -2,7 +2,7 @@
 layout: default
 title: Home
 nav_order: 1
-last_modified_date: 2025-09-13T10:21:58+01:00
+last_modified_date: 2025-10-28T10:20:58+01:00
 ---
 
 # **buildplan Project Documentation!**
@@ -46,3 +46,6 @@ Some of the project documentation for:
 
 * ### [**Restic Backup Script**](./restic-backup-script/getting-started.md)
     Encrypted, automated backups with `restic` - This guide provides a walkthrough for installing, configuring, and operating automated backup system on Linux using `restic`.
+
+* ### [**Self-Hosted Firefox Sync Server**](./firefox-sync-server/getting-started.md)
+    This guide details how to set up a self-hosted Firefox Sync server using `syncstorage-rs`
