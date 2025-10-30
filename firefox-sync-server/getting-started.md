@@ -85,7 +85,7 @@ nano docker-compose.yaml
 
 Change the `firefox-syncserver` service **from** this:
 
-```
+```yaml
 firefox-syncserver:
   build:
     context: ./app
@@ -94,7 +94,7 @@ firefox-syncserver:
 
 **To** this (using the pre-built image):
 
-```
+```yaml
 firefox-syncserver:
   image: ghcr.io/dan-r/syncstorage-rs-docker:main
 ```
@@ -105,7 +105,7 @@ To prevent logs from consuming all your disk space, add a `logging` section to b
 
 **Complete docker-compose.yaml should look like this:**
 
-```
+```yaml
 services:
   firefox-mariadb:
     container_name: firefox-mariadb
@@ -154,7 +154,7 @@ cat data/initdb.d/init.sql
 
 It should contain:
 
-```SQL
+```sql
 CREATE DATABASE IF NOT EXISTS syncstorage_rs;
 CREATE DATABASE IF NOT EXISTS tokenserver_rs;
 GRANT ALL PRIVILEGES ON syncstorage_rs.* TO 'sync'@'%';
@@ -187,9 +187,21 @@ Wait until you see:
 
 Your sync server is running on `http://localhost:8000`. You **must** expose it securely over HTTPS (port 443).
 
+### Using Pangolin
+
+1.  Access Pangolin UI.
+2.  Create a **Site**:
+    - **Domain:** `sync.yourdomain.com`
+    - Enable **SSL/TLS**.
+3.  Create a **Resource**:
+    - **Type:** `HTTP`
+    - **Target:** `firefox-syncserver:8000` (if on the same Docker network as newt or Pangolin on same VPS) or `http://localhost:8000`.        
+    - **CRITICAL:** Do **NOT** enable any authentication (OIDC, Basic Auth, etc.).
+4.  Add **Security Headers** & **Rate Limiting** **Geo-blocking** as needed.
+
 ### Using Nginx
 
-This is a secure, production-ready config.
+This is a secure, example config.
 
 ```
 # Define rate limiting zone
@@ -222,18 +234,6 @@ server {
     }
 }
 ```
-
-### Using Pangolin
-
-1.  Access Pangolin UI.
-2.  Create a **Site**:
-    - **Domain:** `sync.yourdomain.com`
-    - Enable **SSL/TLS**.
-3.  Create a **Resource**:
-    - **Type:** `HTTP`
-    - **Target:** `firefox-syncserver:8000` (if on the same Docker network as newt or Pangolin on same VPS) or `http://localhost:8000`.        
-    - **CRITICAL:** Do **NOT** enable any authentication (OIDC, Basic Auth, etc.).
-4.  Add **Security Headers** & **Rate Limiting** **Geo-blocking** as needed.
 
 -----
 
