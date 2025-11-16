@@ -5,69 +5,42 @@
   <meta name="robots" content="noindex">
   <title>{{ page.title }} - buildplan Scripts</title>
   <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       padding: 40px 20px;
       max-width: 1000px;
       margin: 0 auto;
       line-height: 1.6;
-      background: #27262b;  /* Matches main site background */
+      background: #27262b;
       color: #c9d1d9;
     }
     .header {
-      background: #27272c;  /* Slightly darker for contrast */
+      background: #27272c;
       padding: 30px;
       border-radius: 8px;
       margin-bottom: 30px;
-      border: 1px solid #3d3d42;  /* Subtle border */
-    }
-    h1 {
-      color: #5e9ed6;
-      margin-bottom: 10px;
-      font-size: 2em;
-    }
-    h2 {
-    color: #5e9ed6;
-    margin-top: 30px;
-    margin-bottom: 15px;
-    font-size: 1.5em;
-    }
-    h3 {
-      color: #7ea4db;  /* Slightly lighter blue */
-    }
-    p {
-      color: #9e9e9e;  /* Softer gray for body text */
-      margin-bottom: 15px;
-    }
-    .install-cmd {
-      background: #1c1c1f;  /* Darker code block background */
-      color: #e6edf3;
-      padding: 20px;
-      border-radius: 6px;
-      margin: 20px 0;
-      overflow-x: auto;
-      font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
-      font-size: 14px;
       border: 1px solid #3d3d42;
-      white-space: pre-wrap;
     }
+    h1 { color: #5e9ed6; margin-bottom: 10px; font-size: 2em; }
+    h2 { color: #5e9ed6; margin-top: 30px; margin-bottom: 15px; font-size: 1.5em; }
+    h3 { color: #7ea4db; }
+    p { color: #9e9e9e; margin-bottom: 15px; }
     .warning {
-      background: #3a2f1f;  /* Warm dark brown for warnings */
+      background: #3a2f1f;
       border-left: 4px solid #d29922;
       padding: 15px 20px;
       margin: 20px 0;
       border-radius: 4px;
       color: #f0ad4e;
     }
-    .warning strong {
-      color: #f0ad4e;
-    }
+    .warning strong { color: #f0ad4e; }
     .links {
       margin-top: 25px;
       display: flex;
@@ -109,76 +82,91 @@
       text-decoration: none;
       font-size: 14px;
     }
-    .back-link:hover {
-      text-decoration: underline;
-      color: #7ea4db;
+    .back-link:hover { text-decoration: underline; color: #7ea4db; }
+    .file-list { color: #9e9e9e; margin-left: 20px; list-style-type: disc; }
+    .file-list li { margin-bottom: 8px; }
+    .file-list strong { color: #c9d1d9; }
+    .code-block-wrapper { position: relative; margin: 20px 0; }
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #2ea043;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      z-index: 10;
+      transition: background 0.2s;
     }
-    .file-list {
-      color: #9e9e9e;
-      margin-left: 20px;
-      list-style-type: disc;
-    }
-    .file-list li {
-      margin-bottom: 8px;
-    }
-    .file-list strong {
-      color: #c9d1d9;
+    .copy-btn:hover { background: #238636; }
+    .copy-btn:active { background: #1a7f37; }
+    pre[class*="language-"] {
+      padding-top: 40px !important;
+      position: relative;
+      margin: 0;
     }
   </style>
 </head>
 <body>
   <a href="/scripts/" class="back-link">← Back to Scripts</a>
-  
   <div class="header">
     <h1>{{ page.title }}</h1>
     <p>{{ page.description }}</p>
-    
     <div class="warning">
       ❗ <strong>Security Warning:</strong> Always review scripts before running them with curl piping. View the source code on GitHub or download it first.
     </div>
   </div>
-
   {% if page.interactive %}
   <h2>🛠️ Installation (Interactive Script)</h2>
-  
   <div class="method">
     <h3>Recommended: Download and Run</h3>
     <p>This script requires user input. Download it first:</p>
-    <div class="install-cmd">curl -fsSL {{ page.script_url }} -o {{ page.script_name }}
+    <div class="code-block-wrapper">
+      <button class="copy-btn" type="button" onclick="copyCode(this)">📋 Copy</button>
+      <pre><code class="language-bash">curl -fsSL {{ page.script_url }} -o {{ page.script_name }}
 chmod +x {{ page.script_name }}
-./{{ page.script_name }}</div>
+./{{ page.script_name }}</code></pre>
+    </div>
   </div>
-  
   <div class="method">
     <h3>Alternative: One-Liner</h3>
-    <div class="install-cmd">bash -c "$(curl -fsSL {{ page.script_url }})"</div>
+    <div class="code-block-wrapper">
+      <button class="copy-btn" type="button" onclick="copyCode(this)">📋 Copy</button>
+      <pre><code class="language-bash">bash -c "$(curl -fsSL {{ page.script_url }})"</code></pre>
+    </div>
   </div>
-  
   {% else %}
   <h2>⏱️ Quick Install</h2>
-  
   <div class="method">
     <h3>One-Line Install</h3>
-    <div class="install-cmd">curl -fsSL {{ page.script_url }} | sh</div>
+    <div class="code-block-wrapper">
+      <button class="copy-btn" type="button" onclick="copyCode(this)">📋 Copy</button>
+      <pre><code class="language-bash">curl -fsSL {{ page.script_url }} | sh</code></pre>
+    </div>
   </div>
-  
   <div class="method">
     <h3>Download and Inspect First (Recommended)</h3>
-    <div class="install-cmd">curl -fsSL {{ page.script_url }} -o {{ page.script_name }}
+    <div class="code-block-wrapper">
+      <button class="copy-btn" type="button" onclick="copyCode(this)">📋 Copy</button>
+      <pre><code class="language-bash">curl -fsSL {{ page.script_url }} -o {{ page.script_name }}
 cat {{ page.script_name }}
 chmod +x {{ page.script_name }}
-./{{ page.script_name }}</div>
+./{{ page.script_name }}</code></pre>
+    </div>
   </div>
   {% endif %}
-
   {% if page.requires_additional_files and page.additional_files %}
   <h2>⚙️ Required Configuration Files</h2>
   <div style="background: #161b22; padding: 20px; border-radius: 6px; border: 1px solid #30363d; margin-bottom: 20px;">
     <p style="color: #8b949e; margin-bottom: 15px;">
       This script requires additional configuration files to function. Download all files together:
     </p>
-
-    <div class="install-cmd"># Create directory and download all files
+    <div class="code-block-wrapper">
+      <button class="copy-btn" type="button" onclick="copyCode(this)">📋 Copy</button>
+      <pre><code class="language-bash"># Create directory and download all files
 mkdir -p ~/backup-config && cd ~/backup-config
 
 # Download main script
@@ -190,9 +178,9 @@ curl -fsSL {{ file.url }} -o {{ file.name }}
 # Make script executable
 chmod +x {{ page.script_name }}
 
-# Secure config file permissions (adjust as needed)
-chmod 600 *.conf</div>
-    
+# Secure config file permissions
+chmod 600 *.conf</code></pre>
+    </div>
     <h3 style="color: #58a6ff; margin-top: 20px; margin-bottom: 10px; font-size: 1.1em;">File Descriptions</h3>
     <ul class="file-list">
       <li><strong>{{ page.script_name }}</strong> - Main executable script</li>
@@ -202,25 +190,37 @@ chmod 600 *.conf</div>
     </ul>
   </div>
   {% endif %}
-
   <div class="links">
     <a href="{{ page.script_url }}" download>📥 Download Script</a>
-    <a href="{{ page.github_raw_url }}" target="_blank">🔗 View on GitHub</a>
-    <a href="{{ page.github_repo_url }}" target="_blank">📂 Repository</a>
+    <a href="{{ page.github_raw_url }}" target="_blank" rel="noopener">🔗 View on GitHub</a>
+    <a href="{{ page.github_repo_url }}" target="_blank" rel="noopener">📂 Repository</a>
   </div>
-
   <h2>📝 Review Before Running</h2>
   <div style="background: #161b22; padding: 30px; border-radius: 6px; border: 1px solid #30363d; text-align: center;">
     <p style="color: #8b949e; margin-bottom: 20px; font-size: 16px;">
       Always review scripts before executing them with curl piping.
     </p>
-    <a href="{{ page.github_raw_url }}" target="_blank" style="display: inline-block; padding: 14px 28px; background: #238636; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; transition: background 0.2s;" onmouseover="this.style.background='#2ea043'" onmouseout="this.style.background='#238636'">
+    <a href="{{ page.github_raw_url }}" target="_blank" rel="noopener" style="display: inline-block; padding: 14px 28px; background: #238636; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; transition: background 0.2s;" onmouseover="this.style.background='#2ea043'" onmouseout="this.style.background='#238636'">
       📄 View Script Source on GitHub
     </a>
     <p style="color: #6e7681; margin-top: 20px; font-size: 14px;">
       Opens in a new tab.
     </p>
   </div>
-
+  <script>
+    function copyCode(button) {
+      var orig = button.textContent;
+      var codeElem = button.nextElementSibling.querySelector('code');
+      var text = codeElem.textContent || codeElem.innerText;
+      navigator.clipboard.writeText(text).then(function() {
+        button.textContent = '✅ Copied!';
+        setTimeout(function() { button.textContent = orig; }, 1800);
+      }, function() {
+        button.textContent = '❌ Failed';
+        setTimeout(function() { button.textContent = orig; }, 1800);
+      });
+    }
+    Prism.highlightAll();
+  </script>
 </body>
 </html>
