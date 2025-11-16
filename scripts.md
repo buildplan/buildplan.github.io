@@ -12,37 +12,35 @@ last_modified_date: 2025-11-16T15:20:58+01:00
 Professional, ready-to-use installation scripts for various tools and configurations.
 
 {: .warning }
-> **Security Best Practice**  
-> Always review scripts before running them. Each script page shows its full source code for transparency.
+> **Security Best Practice:** Always review scripts before running them. Each script page shows its full source code for transparency.
 
 ## Available Scripts
 
 {% for script in site.scripts %}
+
 ### {{ script.title }}
 
 {{ script.description }}
 
+{% if script.requires_sudo %}
+
+> <em><strong style="color: #f0ad4e;">Note:</strong> This script requires <code>sudo</code> privileges to run.</em>
+
+{% endif %}
+
 {% if script.interactive %}
-**Installation (Interactive Script):**
 
-This script requires user input and cannot be piped directly to sh.
-
-**Recommended Method:**
-
-```bash
-curl -fsSL {{ script.script_url }} -o {{ script.script_name }}
-chmod +x {{ script.script_name }}
-sudo ./{{ script.script_name }}
-```
-
-**One-Liner Alternative:**
-
-```bash
-bash -c "$(curl -fsSL {{ script.script_url }})"
-```
+> **Installation:** This script is **interactive** and cannot be piped.
 
 {% else %}
-**Quick Install:**
+
+{% if script.no_pipe %}
+
+> **Installation:** This script **cannot be piped** for safety. Please download it first.
+
+{% else %}
+
+**Quick Install (One-Liner):**
 
 ```bash
 curl -fsSL {{ script.script_url }} | sh
