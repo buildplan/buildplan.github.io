@@ -8,7 +8,7 @@ search_enabled: true
 favicon_ico: "/assets/images/favicon.ico"
 logo: "/assets/images/logo.png"
 
-url: "https://buildpaln.org"
+url: "https://buildplan.org"
 
 aux_links:
   "GitHub Profile":
@@ -22,3 +22,17 @@ gh_edit_link_text: "Edit this page on GitHub"
 gh_edit_repository: "https://github.com/buildplan/buildplan.github.io"
 gh_edit_branch: "main"
 gh_edit_view_mode: "tree"
+
+# Scripts collection configuration
+collections:
+  scripts:
+    output: true
+    permalink: /:name
+
+defaults:
+  - scope:
+      type: scripts
+    values:
+      layout: script_redirect
+      nav_exclude: true
+      search_exclude: true
