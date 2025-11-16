@@ -57,21 +57,6 @@
       content: '$ ';
       color: #58a6ff;
     }
-    #script-content {
-      background: #0d1117;
-      color: #c9d1d9;
-      padding: 20px;
-      border-radius: 6px;
-      overflow-x: auto;
-      font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
-      font-size: 13px;
-      line-height: 1.6;
-      white-space: pre;
-      max-height: 600px;
-      overflow-y: auto;
-      border: 1px solid #30363d;
-      margin-top: 15px;
-    }
     .warning {
       background: #1c2128;
       border-left: 4px solid #d29922;
@@ -127,14 +112,6 @@
     .back-link:hover {
       text-decoration: underline;
     }
-    .loading {
-      color: #58a6ff;
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
   </style>
 </head>
 <body>
@@ -145,7 +122,7 @@
     <p>{{ page.description }}</p>
     
     <div class="warning">
-      ⚠️ <strong>Security Warning:</strong> Always review scripts before running them with curl piping. Read the source code below or download it first.
+      ⚠️ <strong>Security Warning:</strong> Always review scripts before running them with curl piping. View the source code on GitHub or download it first.
     </div>
   </div>
 
@@ -179,27 +156,22 @@
 
   <div class="links">
     <a href="{{ page.script_url }}" download>📥 Download Script</a>
-    <a href="{{ page.github_raw_url }}" target="_blank">🔗 GitHub Raw</a>
+    <a href="{{ page.github_raw_url }}" target="_blank">🔗 View on GitHub</a>
     <a href="{{ page.github_repo_url }}" target="_blank">📂 Repository</a>
   </div>
 
-  <h2>Script Contents</h2>
-  <div id="script-content" class="loading">Loading script...</div>
+  <h2>Review Before Running</h2>
+  <div style="background: #161b22; padding: 30px; border-radius: 6px; border: 1px solid #30363d; text-align: center;">
+    <p style="color: #8b949e; margin-bottom: 20px; font-size: 16px;">
+      Always review scripts before executing them with curl piping.
+    </p>
+    <a href="{{ page.github_raw_url }}" target="_blank" style="display: inline-block; padding: 14px 28px; background: #238636; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; transition: background 0.2s;" onmouseover="this.style.background='#2ea043'" onmouseout="this.style.background='#238636'">
+      📄 View Script Source on GitHub
+    </a>
+    <p style="color: #6e7681; margin-top: 20px; font-size: 14px;">
+      Opens in a new tab with syntax highlighting
+    </p>
+  </div>
 
-  <script>
-    fetch('{{ page.script_url }}')
-      .then(response => {
-        if (!response.ok) throw new Error('Failed to fetch script');
-        return response.text();
-      })
-      .then(data => {
-        document.getElementById('script-content').textContent = data;
-        document.getElementById('script-content').classList.remove('loading');
-      })
-      .catch(error => {
-        document.getElementById('script-content').textContent = 'Error loading script: ' + error.message + '\n\nPlease visit: {{ page.github_raw_url }}';
-        document.getElementById('script-content').style.color = '#f85149';
-      });
-  </script>
 </body>
 </html>
