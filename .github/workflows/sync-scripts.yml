@@ -40,6 +40,10 @@ jobs:
           curl -fsSL https://raw.githubusercontent.com/buildplan/container-monitor/refs/heads/main/container-monitor.sh \
             -o scripts/container-monitor.sh
 
+          # VPS Benchmark
+          curl -fsSL https://raw.githubusercontent.com/buildplan/learning/refs/heads/main/vps-benchmark.sh \
+            -o scripts/vps-benchmark.sh
+
           # Add more scripts here as needed
           # curl -fsSL https://raw.githubusercontent.com/USER/REPO/BRANCH/script.sh \
           #   -o scripts/script.sh
