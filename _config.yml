@@ -27,7 +27,6 @@ gh_edit_view_mode: "tree"
 collections:
   scripts:
     output: true
-    permalink: /:basename:output_ext
 
 defaults:
   - scope:
