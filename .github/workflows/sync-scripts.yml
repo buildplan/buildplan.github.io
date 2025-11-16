@@ -1,0 +1,42 @@
+name: Sync Scripts from Source Repos
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Every Sunday at midnight
+  workflow_dispatch:     # Manual trigger
+  push:
+    paths:
+      - '.github/workflows/sync-scripts.yml'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create scripts directory
+        run: mkdir -p scripts
+
+      - name: Fetch scripts from source repositories
+        run: |
+          # Deploy daemon config
+          curl -fsSL https://raw.githubusercontent.com/buildplan/docker/refs/heads/main/deploy-daemon-config.sh \
+            -o scripts/deploy-daemon-config.sh
+
+          # Add more scripts here as needed
+          # curl -fsSL https://raw.githubusercontent.com/USER/REPO/BRANCH/script.sh \
+          #   -o scripts/script.sh
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add scripts/
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: sync scripts from source repositories"
+            git push
+          else
+            echo "No changes to commit"
+          fi

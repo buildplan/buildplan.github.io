@@ -1,30 +1,37 @@
 ---
 layout: default
-title: Quick Install Scripts
+title: Installation Scripts
 nav_exclude: true
 search_exclude: true
 permalink: /scripts/
 ---
 
-# Quick Install Scripts
+# 🚀 Quick Installation Scripts
+
+Professional, ready-to-use installation scripts for various tools and configurations.
 
 {: .warning }
-> **Always review scripts before running them with curl piping.**
-> View the source code on GitHub first.
+> **Security Best Practice**  
+> Always review scripts before running them with `curl | sh`. Each script below shows its full source code for transparency.
 
-## Available Scripts
+## 📋 Available Scripts
 
 {% for script in site.scripts %}
-
 ### {{ script.title }}
 
 {{ script.description }}
 
+**Quick Install:**
+
 ```bash
-curl -fsSL https://buildplan.org/{{ script.slug }} | sh
+curl -fsSL {{ script.script_url }} | sh
 ```
 
-[View Source]({{ script.github_raw_url }}) · [Repository]({{ script.github_repo_url }})
+[📖 View Details & Source]({{ script.url }}) • [📥 Download]({{ script.script_url }}) • [🔗 Repository]({{ script.github_repo_url }})
 
 ---
 {% endfor %}
+
+## 📚 Need Help?
+
+Check out the [main documentation](/) for detailed guides and setup instructions.

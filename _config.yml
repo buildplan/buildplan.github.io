@@ -23,7 +23,14 @@ gh_edit_repository: "https://github.com/buildplan/buildplan.github.io"
 gh_edit_branch: "main"
 gh_edit_view_mode: "tree"
 
-# Scripts collection configuration
+# Include scripts directory for curl access
+include:
+  - scripts
+
+keep_files:
+  - scripts
+
+# Scripts documentation collection
 collections:
   scripts:
     output: true
