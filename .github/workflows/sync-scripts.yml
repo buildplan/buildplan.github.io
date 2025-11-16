@@ -44,6 +44,10 @@ jobs:
           curl -fsSL https://raw.githubusercontent.com/buildplan/learning/refs/heads/main/vps-benchmark.sh \
             -o scripts/vps-benchmark.sh
 
+          # VPS Benchmark
+          curl -fsSL https://raw.githubusercontent.com/buildplan/rsync-backup-script/refs/heads/main/backup_script.sh \
+            -o scripts/backup_script.sh
+  
           # Add more scripts here as needed
           # curl -fsSL https://raw.githubusercontent.com/USER/REPO/BRANCH/script.sh \
           #   -o scripts/script.sh
