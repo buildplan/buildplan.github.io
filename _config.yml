@@ -11,6 +11,8 @@ logo: "/assets/images/logo.png"
 url: "https://buildplan.org"
 
 aux_links:
+  "Scripts":
+    - "https://buildplan.org/scripts/"
   "GitHub Profile":
     - "https://github.com/buildplan"
 
