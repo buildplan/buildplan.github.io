@@ -1,5 +1,5 @@
 ---
-permalink: /docs/container-monitor
+permalink:  /docs/container-monitor
 title: "Docker Container Monitor"
 description: "Bash script for monitoring Docker containers - checks health, resource usage, image updates, and sends notifications"
 script_url: "https://buildplan.org/scripts/container-monitor.sh"
