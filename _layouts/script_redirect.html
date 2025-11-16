@@ -150,7 +150,7 @@
   </div>
 
   {% if page.interactive %}
-  <h2>📥 Installation (Interactive Script)</h2>
+  <h2>Installation (Interactive Script)</h2>
   
   <div class="method">
     <h3>Recommended: Download and Run</h3>
@@ -183,11 +183,11 @@
     <a href="{{ page.github_repo_url }}" target="_blank">📂 Repository</a>
   </div>
 
-  <h2>📜 Script Contents</h2>
+  <h2>Script Contents</h2>
   <div id="script-content" class="loading">Loading script...</div>
 
   <script>
-    fetch('{{ page.github_raw_url }}')
+    fetch('{{ page.script_url }}')
       .then(response => {
         if (!response.ok) throw new Error('Failed to fetch script');
         return response.text();
