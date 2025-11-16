@@ -8,6 +8,9 @@ on:
     paths:
       - '.github/workflows/sync-scripts.yml'
 
+permissions:
+  contents: write
+
 jobs:
   sync:
     runs-on: ubuntu-latest
