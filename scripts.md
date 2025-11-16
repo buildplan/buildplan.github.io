@@ -15,15 +15,16 @@ permalink: /scripts/
 ## Available Scripts
 
 {% for script in site.scripts %}
+
 ### {{ script.title }}
 
 {{ script.description }}
 
+```bash
 curl -fsSL https://buildplan.org/{{ script.slug }} | sh
-
+```
 
 [View Source]({{ script.github_raw_url }}) · [Repository]({{ script.github_repo_url }})
 
 ---
 {% endfor %}
-
