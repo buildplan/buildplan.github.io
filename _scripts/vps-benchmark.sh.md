@@ -7,4 +7,6 @@ script_name: "vps-benchmark.sh"
 github_raw_url: "https://raw.githubusercontent.com/buildplan/learning/refs/heads/main/vps-benchmark.sh"
 github_repo_url: "https://github.com/buildplan/learning/"
 interactive: false
+requires_sudo: true
+no_pipe: false
 ---

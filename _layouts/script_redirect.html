@@ -6,9 +6,9 @@
   <title>{{ page.title }} - buildplan Scripts</title>
   <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.30.0/themes/prism-tomorrow.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.30.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.30.0/components/prism-bash.min.js"></script>
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -119,8 +119,21 @@
       ❗ <strong>Security Warning:</strong> Always review scripts before running them with curl piping. View the source code on GitHub or download it first.
     </div>
   </div>
+
   {% if page.interactive %}
   <h2>🛠️ Installation (Interactive Script)</h2>
+  
+  {% if page.requires_sudo %}
+  <div class="method" style="padding-bottom: 5px;">
+    <p><strong>Note:</strong> This script will require <code>sudo</code> privileges to run.</p>
+  </div>
+  {% endif %}
+  {% if page.no_pipe %}
+  <div class="method" style="padding-bottom: 5px;">
+    <p><strong>Note:</strong> This script <em>cannot</em> be piped. Please use one of the download methods below.</p>
+  </div>
+  {% endif %}
+
   <div class="method">
     <h3>Recommended: Download and Run</h3>
     <p>This script requires user input. Download it first:</p>
@@ -128,36 +141,58 @@
       <button class="copy-btn" type="button">📋 Copy</button>
       <pre><code class="language-bash">curl -fsSL {{ page.script_url }} -o {{ page.script_name }}
 chmod +x {{ page.script_name }}
-./{{ page.script_name }}</code></pre>
+{% if page.requires_sudo %}sudo {% endif %}./{{ page.script_name }}</code></pre>
     </div>
   </div>
   <div class="method">
     <h3>Alternative: One-Liner</h3>
+    {% if page.no_pipe %}
+    <p><em>This method is <strong>not supported</strong> for this script. Please use the "Download and Run" method above.</em></p>
+    {% else %}
     <div class="code-block-wrapper">
       <button class="copy-btn" type="button">📋 Copy</button>
       <pre><code class="language-bash">bash -c "$(curl -fsSL {{ page.script_url }})"</code></pre>
     </div>
+    {% endif %}
   </div>
+
   {% else %}
   <h2>⏱️ Quick Install</h2>
+
+  {% if page.no_pipe %}
+  <div class="method" style="padding-bottom: 5px;">
+    <p><strong>Note:</strong> This script <em>cannot</em> be safely piped to <code>sh</code>. Please use the "Download and Inspect" method.</p>
+  </div>
+  {% endif %}
+  {% if page.requires_sudo %}
+  <div class="method" style="padding-bottom: 5px;">
+    <p><strong>Note:</strong> This script requires <code>sudo</code> privileges to run.</p>
+  </div>
+  {% endif %}
+
   <div class="method">
     <h3>One-Line Install</h3>
+    {% if page.no_pipe %}
+    <p><em>This method is <strong>not recommended</strong> for this script.</em></p>
+    {% else %}
     <div class="code-block-wrapper">
       <button class="copy-btn" type="button">📋 Copy</button>
       <pre><code class="language-bash">curl -fsSL {{ page.script_url }} | sh</code></pre>
     </div>
+    {% endif %}
   </div>
+
   <div class="method">
     <h3>Download and Inspect First (Recommended)</h3>
     <div class="code-block-wrapper">
       <button class="copy-btn" type="button">📋 Copy</button>
       <pre><code class="language-bash">curl -fsSL {{ page.script_url }} -o {{ page.script_name }}
 cat {{ page.script_name }}
-chmod +x {{ page.script_name }}
-./{{ page.script_name }}</code></pre>
+{% if page.requires_sudo %}sudo {% endif %}bash {{ page.script_name }}</code></pre>
     </div>
   </div>
   {% endif %}
+  
   {% if page.requires_additional_files and page.additional_files %}
   <h2>⚙️ Required Configuration Files</h2>
   <div style="background: #161b22; padding: 20px; border-radius: 6px; border: 1px solid #30363d; margin-bottom: 20px;">
@@ -175,6 +210,7 @@ curl -fsSL {{ page.script_url }} -o {{ page.script_name }}
 # Download {{ file.description }}
 curl -fsSL {{ file.url }} -o {{ file.name }}
 {% endfor %}
+
 # Make script executable
 chmod +x {{ page.script_name }}
 
@@ -190,11 +226,13 @@ chmod 600 *.conf</code></pre>
     </ul>
   </div>
   {% endif %}
+  
   <div class="links">
     <a href="{{ page.script_url }}" download>📥 Download Script</a>
     <a href="{{ page.github_raw_url }}" target="_blank" rel="noopener">🔗 View on GitHub</a>
     <a href="{{ page.github_repo_url }}" target="_blank" rel="noopener">📂 Repository</a>
   </div>
+  
   <h2>📝 Review Before Running</h2>
   <div style="background: #161b22; padding: 30px; border-radius: 6px; border: 1px solid #30363d; text-align: center;">
     <p style="color: #8b949e; margin-bottom: 20px; font-size: 16px;">

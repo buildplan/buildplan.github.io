@@ -7,4 +7,6 @@ script_name: "deploy-daemon-config.sh"
 github_raw_url: "https://raw.githubusercontent.com/buildplan/docker/refs/heads/main/deploy-daemon-config.sh"
 github_repo_url: "https://github.com/buildplan/docker"
 interactive: false
+requires_sudo: true
+no_pipe: false
 ---

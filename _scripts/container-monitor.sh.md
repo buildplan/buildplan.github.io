@@ -7,6 +7,8 @@ script_name: "container-monitor.sh"
 github_raw_url: "https://raw.githubusercontent.com/buildplan/container-monitor/refs/heads/main/container-monitor.sh"
 github_repo_url: "https://github.com/buildplan/container-monitor"
 interactive: false
+requires_sudo: false
+no_pipe: true
 requires_additional_files: true
 additional_files:
   - name: "config.yml"
