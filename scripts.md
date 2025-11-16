@@ -23,20 +23,22 @@ Professional, ready-to-use installation scripts for various tools and configurat
 {{ script.description }}
 
 {% if script.requires_sudo %}
-
-> <em><strong style="color: #f0ad4e;">Note:</strong> This script requires <code>sudo</code> privileges to run.</em>
-
+<p style="margin-top: 10px;">
+  <em><strong style="color: #f0ad4e;">Note:</strong> This script requires <code>sudo</code> privileges to run.</em>
+</p>
 {% endif %}
 
 {% if script.interactive %}
 
 > **Installation:** This script is **interactive** and cannot be piped.
 
-{% else %}
-
-{% if script.no_pipe %}
+{% elsif script.no_pipe %}
 
 > **Installation:** This script **cannot be piped** for safety. Please download it first.
+
+{% elsif script.requires_sudo %}
+
+> **Installation:** This script requires <code>sudo</code>. Please click "View Details" for the recommended install commands.
 
 {% else %}
 
