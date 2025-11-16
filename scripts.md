@@ -9,10 +9,11 @@ last_modified_date: 2025-11-16T15:20:58+01:00
 
 # Quick Installation Scripts
 
-Professional, ready-to-use installation scripts for various tools and configurations.
+Scripts for various tools and configurations.
 
 {: .warning }
-> **Security Best Practice:** Always review scripts before running them. Each script page shows its full source code for transparency.
+> **Security Best Practice:**
+> Always review scripts before running them. Each script page shows its full source code for transparency.
 
 ## Available Scripts
 
@@ -36,16 +37,12 @@ Professional, ready-to-use installation scripts for various tools and configurat
 
 > **Installation:** This script **cannot be piped** for safety. Please download it first.
 
-{% elsif script.requires_sudo %}
-
-> **Installation:** This script requires <code>sudo</code>. Please click "View Details" for the recommended install commands.
-
 {% else %}
 
 **Quick Install (One-Liner):**
 
 ```bash
-curl -fsSL {{ script.script_url }} | sh
+curl -fsSL {{ script.script_url }} | {% if script.requires_sudo %}sudo {% endif %}sh
 ```
 
 {% endif %}
