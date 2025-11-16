@@ -51,11 +51,7 @@
       font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
       font-size: 14px;
       border: 1px solid #30363d;
-      position: relative;
-    }
-    .install-cmd::before {
-      content: '$ ';
-      color: #58a6ff;
+      white-space: pre-wrap;
     }
     .warning {
       background: #1c2128;
@@ -112,6 +108,14 @@
     .back-link:hover {
       text-decoration: underline;
     }
+    .file-list {
+      color: #8b949e;
+      margin-left: 20px;
+      list-style-type: disc;
+    }
+    .file-list li {
+      margin-bottom: 8px;
+    }
   </style>
 </head>
 <body>
@@ -122,17 +126,19 @@
     <p>{{ page.description }}</p>
     
     <div class="warning">
-      ⚠️ <strong>Security Warning:</strong> Always review scripts before running them with curl piping. View the source code on GitHub or download it first.
+      ❗ <strong>Security Warning:</strong> Always review scripts before running them with curl piping. View the source code on GitHub or download it first.
     </div>
   </div>
 
   {% if page.interactive %}
-  <h2>Installation (Interactive Script)</h2>
+  <h2>🛠️ Installation (Interactive Script)</h2>
   
   <div class="method">
     <h3>Recommended: Download and Run</h3>
     <p>This script requires user input. Download it first:</p>
-    <div class="install-cmd">curl -fsSL {{ page.script_url }} -o {{ page.script_name }}<br>chmod +x {{ page.script_name }}<br>./{{ page.script_name }}</div>
+    <div class="install-cmd">curl -fsSL {{ page.script_url }} -o {{ page.script_name }}
+chmod +x {{ page.script_name }}
+./{{ page.script_name }}</div>
   </div>
   
   <div class="method">
@@ -141,7 +147,7 @@
   </div>
   
   {% else %}
-  <h2>Quick Install</h2>
+  <h2>⏱️ Quick Install</h2>
   
   <div class="method">
     <h3>One-Line Install</h3>
@@ -150,7 +156,42 @@
   
   <div class="method">
     <h3>Download and Inspect First (Recommended)</h3>
-    <div class="install-cmd">curl -fsSL {{ page.script_url }} -o {{ page.script_name }}<br>cat {{ page.script_name }}<br>chmod +x {{ page.script_name }}<br>./{{ page.script_name }}</div>
+    <div class="install-cmd">curl -fsSL {{ page.script_url }} -o {{ page.script_name }}
+cat {{ page.script_name }}
+chmod +x {{ page.script_name }}
+./{{ page.script_name }}</div>
+  </div>
+  {% endif %}
+
+  {% if page.requires_additional_files and page.additional_files %}
+  <h2>⚙️ Required Configuration Files</h2>
+  <div style="background: #161b22; padding: 20px; border-radius: 6px; border: 1px solid #30363d; margin-bottom: 20px;">
+    <p style="color: #8b949e; margin-bottom: 15px;">
+      This script requires additional configuration files to function. Download all files together:
+    </p>
+
+    <div class="install-cmd"># Create directory and download all files
+mkdir -p ~/backup-config && cd ~/backup-config
+
+# Download main script
+curl -fsSL {{ page.script_url }} -o {{ page.script_name }}
+{% for file in page.additional_files %}
+# Download {{ file.description }}
+curl -fsSL {{ file.url }} -o {{ file.name }}
+{% endfor %}
+# Make script executable
+chmod +x {{ page.script_name }}
+
+# Secure config file permissions (adjust as needed)
+chmod 600 *.conf</div>
+    
+    <h3 style="color: #58a6ff; margin-top: 20px; margin-bottom: 10px; font-size: 1.1em;">File Descriptions</h3>
+    <ul class="file-list">
+      <li><strong>{{ page.script_name }}</strong> - Main executable script</li>
+      {% for file in page.additional_files %}
+      <li><strong>{{ file.name }}</strong> - {{ file.description }}</li>
+      {% endfor %}
+    </ul>
   </div>
   {% endif %}
 
@@ -160,7 +201,7 @@
     <a href="{{ page.github_repo_url }}" target="_blank">📂 Repository</a>
   </div>
 
-  <h2>Review Before Running</h2>
+  <h2>📝 Review Before Running</h2>
   <div style="background: #161b22; padding: 30px; border-radius: 6px; border: 1px solid #30363d; text-align: center;">
     <p style="color: #8b949e; margin-bottom: 20px; font-size: 16px;">
       Always review scripts before executing them with curl piping.

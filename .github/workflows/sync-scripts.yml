@@ -25,6 +25,14 @@ jobs:
           curl -fsSL https://raw.githubusercontent.com/buildplan/docker/refs/heads/main/deploy-daemon-config.sh \
             -o scripts/deploy-daemon-config.sh
 
+          # du_setup - setup Debian/Ubuntu server
+          curl -fsSL https://raw.githubusercontent.com/buildplan/du_setup/refs/heads/main/du_setup.sh \
+            -o scripts/du_setup.sh
+
+          # Restic backup script (main script only - configs are templates)
+          curl -fsSL https://raw.githubusercontent.com/buildplan/restic-backup-script/refs/heads/main/restic-backup.sh \
+            -o scripts/restic-backup.sh
+
           # Add more scripts here as needed
           # curl -fsSL https://raw.githubusercontent.com/USER/REPO/BRANCH/script.sh \
           #   -o scripts/script.sh
