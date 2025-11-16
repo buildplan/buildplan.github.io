@@ -2,8 +2,9 @@
 layout: default
 title: Installation Scripts
 nav_exclude: true
-search_exclude: true
+search_exclude: false
 permalink: /scripts/
+last_modified_date: 2025-11-16T15:20:58+01:00
 ---
 
 # Quick Installation Scripts

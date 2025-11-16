@@ -33,6 +33,10 @@ jobs:
           curl -fsSL https://raw.githubusercontent.com/buildplan/restic-backup-script/refs/heads/main/restic-backup.sh \
             -o scripts/restic-backup.sh
 
+          # Container monitor
+          curl -fsSL https://raw.githubusercontent.com/buildplan/container-monitor/refs/heads/main/container-monitor.sh \
+            -o scripts/container-monitor.sh
+
           # Add more scripts here as needed
           # curl -fsSL https://raw.githubusercontent.com/USER/REPO/BRANCH/script.sh \
           #   -o scripts/script.sh
