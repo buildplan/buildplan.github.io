@@ -8,5 +8,5 @@ github_raw_url: "https://raw.githubusercontent.com/buildplan/du_setup/refs/heads
 github_repo_url: "https://github.com/buildplan/du_setup"
 interactive: true
 requires_sudo: true
-no_pipe: true
+no_pipe: false
 ---
