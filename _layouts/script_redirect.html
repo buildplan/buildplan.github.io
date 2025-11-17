@@ -139,7 +139,7 @@
     <p>This script requires user input. Download it first:</p>
     <div class="code-block-wrapper">
       <button class="copy-btn" type="button">📋 Copy</button>
-      <pre><code class="language-bash">curl -fsSL {{ page.script_url }} -o {{ page.script_name }}
+      <pre><code class="language-bash">curl -L {{ page.script_url }} -o {{ page.script_name }}
 chmod +x {{ page.script_name }}
 {% if page.requires_sudo %}sudo {% endif %}./{{ page.script_name }}</code></pre>
     </div>
@@ -151,7 +151,7 @@ chmod +x {{ page.script_name }}
     {% else %}
     <div class="code-block-wrapper">
       <button class="copy-btn" type="button">📋 Copy</button>
-      <pre><code class="language-bash">bash -c "$(curl -fsSL {{ page.script_url }})"</code></pre>
+      <pre><code class="language-bash">bash -c "$(curl -L {{ page.script_url }})"</code></pre>
     </div>
     {% endif %}
   </div>
@@ -177,7 +177,7 @@ chmod +x {{ page.script_name }}
     {% else %}
     <div class="code-block-wrapper">
       <button class="copy-btn" type="button">📋 Copy</button>
-      <pre><code class="language-bash">curl -fsSL {{ page.script_url }} | sh</code></pre>
+      <pre><code class="language-bash">curl -L {{ page.script_url }} | {% if page.requires_sudo %}sudo {% endif %}bash</code></pre>
     </div>
     {% endif %}
   </div>
@@ -186,7 +186,7 @@ chmod +x {{ page.script_name }}
     <h3>Download and Inspect First (Recommended)</h3>
     <div class="code-block-wrapper">
       <button class="copy-btn" type="button">📋 Copy</button>
-      <pre><code class="language-bash">curl -fsSL {{ page.script_url }} -o {{ page.script_name }}
+      <pre><code class="language-bash">curl -L {{ page.script_url }} -o {{ page.script_name }}
 cat {{ page.script_name }}
 {% if page.requires_sudo %}sudo {% endif %}bash {{ page.script_name }}</code></pre>
     </div>
@@ -205,10 +205,10 @@ cat {{ page.script_name }}
 mkdir -p ~/backup-config && cd ~/backup-config
 
 # Download main script
-curl -fsSL {{ page.script_url }} -o {{ page.script_name }}
+curl -L {{ page.script_url }} -o {{ page.script_name }}
 {% for file in page.additional_files %}
 # Download {{ file.description }}
-curl -fsSL {{ file.url }} -o {{ file.name }}
+curl -L {{ file.url }} -o {{ file.name }}
 {% endfor %}
 
 # Make script executable

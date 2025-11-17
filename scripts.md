@@ -42,7 +42,7 @@ Scripts for various tools and configurations.
 **Quick Install (One-Liner):**
 
 ```bash
-curl -fsSL {{ script.script_url }} | {% if script.requires_sudo %}sudo {% endif %}sh
+curl -L {{ script.script_url }} | {% if script.requires_sudo %}sudo {% endif %}bash
 ```
 
 {% endif %}
