@@ -31,22 +31,18 @@ Scripts for various tools and configurations.
 
 {% if script.interactive %}
 
-> **Installation:** This script is **interactive**. Please click "View Details" for install commands.
+> **Installation:** This script is **interactive** and cannot be piped.
 
 {% elsif script.no_pipe %}
 
-**Quick Install (Download and run):**
-
-```bash
-curl -LO {{ script.script_url }} && {% if script.requires_sudo %}sudo {% endif %}bash {{ script.script_name }}
-```
+> **Installation:** This script **cannot be piped** for safety. Please download it first.
 
 {% else %}
 
 **Quick Install (One-Liner):**
 
 ```bash
-curl -LO {{ script.script_url }} && chmod +x {{ script.script_name }} && {% if script.requires_sudo %}sudo {% endif %}./{{ script.script_name }}
+curl -L {{ script.script_url }} | {% if script.requires_sudo %}sudo {% endif %}bash
 ```
 
 {% endif %}
