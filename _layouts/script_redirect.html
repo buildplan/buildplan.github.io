@@ -139,21 +139,10 @@
     <p>This script requires user input. Download it first:</p>
     <div class="code-block-wrapper">
       <button class="copy-btn" type="button">📋 Copy</button>
-      <pre><code class="language-bash">curl -L {{ page.script_url }} -o {{ page.script_name }}
+      <pre><code class="language-bash">curl -LO {{ page.script_url }}
 chmod +x {{ page.script_name }}
 {% if page.requires_sudo %}sudo {% endif %}./{{ page.script_name }}</code></pre>
     </div>
-  </div>
-  <div class="method">
-    <h3>Alternative: One-Liner</h3>
-    {% if page.no_pipe %}
-    <p><em>This method is <strong>not supported</strong> for this script. Please use the "Download and Run" method above.</em></p>
-    {% else %}
-    <div class="code-block-wrapper">
-      <button class="copy-btn" type="button">📋 Copy</button>
-      <pre><code class="language-bash">bash -c "$(curl -L {{ page.script_url }})"</code></pre>
-    </div>
-    {% endif %}
   </div>
 
   {% else %}
@@ -171,24 +160,21 @@ chmod +x {{ page.script_name }}
   {% endif %}
 
   <div class="method">
-    <h3>One-Line Install</h3>
-    {% if page.no_pipe %}
-    <p><em>This method is <strong>not recommended</strong> for this script.</em></p>
-    {% else %}
-    <div class="code-block-wrapper">
-      <button class="copy-btn" type="button">📋 Copy</button>
-      <pre><code class="language-bash">curl -L {{ page.script_url }} | {% if page.requires_sudo %}sudo {% endif %}bash</code></pre>
-    </div>
-    {% endif %}
-  </div>
-
-  <div class="method">
     <h3>Download and Inspect First (Recommended)</h3>
     <div class="code-block-wrapper">
       <button class="copy-btn" type="button">📋 Copy</button>
-      <pre><code class="language-bash">curl -L {{ page.script_url }} -o {{ page.script_name }}
+      {% if page.no_pipe %}
+      <!-- This is for non-executable bash scripts -->
+      <pre><code class="language-bash">curl -LO {{ page.script_url }}
 cat {{ page.script_name }}
 {% if page.requires_sudo %}sudo {% endif %}bash {{ page.script_name }}</code></pre>
+  {% else %}
+      <!-- This is for standard, executable scripts -->
+      <pre><code class="language-bash">curl -LO {{ page.script_url }}
+chmod +x {{ page.script_name }}
+cat {{ page.script_name }}
+{% if page.requires_sudo %}sudo {% endif %}./{{ page.script_name }}</code></pre>
+  {% endif %}
     </div>
   </div>
   {% endif %}
@@ -205,10 +191,10 @@ cat {{ page.script_name }}
 mkdir -p ~/backup-config && cd ~/backup-config
 
 # Download main script
-curl -L {{ page.script_url }} -o {{ page.script_name }}
+curl -LO {{ page.script_url }}
 {% for file in page.additional_files %}
 # Download {{ file.description }}
-curl -L {{ file.url }} -o {{ file.name }}
+curl -LO {{ file.url }}
 {% endfor %}
 
 # Make script executable
