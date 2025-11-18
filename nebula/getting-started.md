@@ -49,14 +49,34 @@ On your **local** machine, download the current Nebula release (adjust version a
 mkdir -p ~/nebula-setup
 cd ~/nebula-setup
 
-# Example for Linux amd64 – replace v1.9.7 with latest
-wget https://github.com/slackhq/nebula/releases/download/v1.9.7/nebula-linux-amd64.tar.gz
+# Automatically download the latest Linux AMD64 release
+curl -L "https://github.com/slackhq/nebula/releases/latest/download/nebula-linux-amd64.tar.gz" -o nebula-linux-amd64.tar.gz
 tar -xvf nebula-linux-amd64.tar.gz
 
 # You now have ./nebula and ./nebula-cert in this directory
 ```
 
 Using the official release ensures you get the latest bug fixes and protocol improvements.
+
+---
+
+## Network Overview
+
+```text
+                          +---------------------+
+                          |    VPS Lighthouse   |
+                          |  (Public IP Static) |
+                          |    172.16.99.1      |
+                          +----------+----------+
+                                     ^
+                                     | (UDP Handshake)
+            +------------------------+------------------------+
+            |                                                 |
++-----------+-----------+                         +-----------+-----------+
+|      My Laptop        |                         |      Home Server      |
+|    172.16.99.2        |<=======================>|      172.16.99.3      |
++-----------------------+   (Direct P2P Tunnel)   +-----------------------+
+```
 
 ---
 
@@ -423,6 +443,10 @@ Wants=basic.target
 After=basic.target network.target
 
 [Service]
+# Run as root to allow creation of tun device
+User=root
+Group=root
+SyslogIdentifier=nebula
 SyslogIdentifier=nebula
 StandardOutput=syslog
 StandardError=syslog
