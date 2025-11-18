@@ -33,7 +33,7 @@ include:
 
 keep_files:
   - scripts
-  
+
 # Scripts documentation collection
 collections:
   scripts:
