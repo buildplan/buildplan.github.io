@@ -28,7 +28,7 @@ This guide assumes:
 You will need the following components before starting:
 
 - **Lighthouse VPS**
-  - Debian 12 (or similar), with a public IPv4 (or IPv6) address $YOUR\_VPS\_PUBLIC\_IP$.
+  - Debian 12 (or similar), with a public IPv4 (or IPv6) address `VPS_PUBLIC_IP`.
   - SSH access as a user with `sudo`.
   - Docker Engine and Docker Compose installed.
 - **Local machine (CA + tooling)**
@@ -113,7 +113,7 @@ Now create the configuration and Docker Compose file on your **local** machine.
 
 ### 1. Lighthouse Nebula config (`config.yaml`)
 
-Create `~/nebula-setup/config.yaml`, substituting your real VPS public IP or DNS for `YOUR_VPS_PUBLIC_IP`.
+Create `~/nebula-setup/config.yaml`, substituting your real VPS public IP or DNS for `VPS_PUBLIC_IP`.
 
 ```yaml
 # ~/nebula-setup/config.yaml
@@ -125,7 +125,7 @@ pki:
 
 static_host_map:
   # Lighthouse Nebula IP -> public IP:port
-  "172.16.99.1": ["YOUR_VPS_PUBLIC_IP:4242"]
+  "172.16.99.1": ["VPS_PUBLIC_IP:4242"]
 
 lighthouse:
   am_lighthouse: true
@@ -222,7 +222,7 @@ Now push the files to the VPS and run the Dockerized Nebula lighthouse.
 SSH into the lighthouse VPS:
 
 ```bash
-ssh user@YOUR_VPS_PUBLIC_IP
+ssh user@VPS_PUBLIC_IP
 
 # On the VPS:
 sudo mkdir -p /opt/nebula/nebula-config
@@ -237,15 +237,15 @@ From your **local machine** in `~/nebula-setup`:
 
 ```bash
 # CA public cert
-scp ca.cert user@YOUR_VPS_PUBLIC_IP:/opt/nebula/nebula-config/ca.crt
+scp ca.cert user@VPS_PUBLIC_IP:/opt/nebula/nebula-config/ca.crt
 
 # Lighthouse cert/key (renamed to generic host names used by config.yaml)
-scp lighthouse.crt user@YOUR_VPS_PUBLIC_IP:/opt/nebula/nebula-config/host.crt
-scp lighthouse.key user@YOUR_VPS_PUBLIC_IP:/opt/nebula/nebula-config/host.key
+scp lighthouse.crt user@VPS_PUBLIC_IP:/opt/nebula/nebula-config/host.crt
+scp lighthouse.key user@VPS_PUBLIC_IP:/opt/nebula/nebula-config/host.key
 
 # Config and docker-compose.yml
-scp config.yaml user@YOUR_VPS_PUBLIC_IP:/opt/nebula/nebula-config/config.yaml
-scp docker-compose.yml user@YOUR_VPS_PUBLIC_IP:/opt/nebula/docker-compose.yml
+scp config.yaml user@VPS_PUBLIC_IP:/opt/nebula/nebula-config/config.yaml
+scp docker-compose.yml user@VPS_PUBLIC_IP:/opt/nebula/docker-compose.yml
 ```
 
 Do **not** copy `ca.key` to the VPS or any other host; this is explicitly warned against in the official quick‑start.
@@ -337,7 +337,7 @@ pki:
 
 static_host_map:
   # Lighthouse: Nebula IP -> public IP:Port
-  "172.16.99.1": ["YOUR_VPS_PUBLIC_IP:4242"]
+  "172.16.99.1": ["VPS_PUBLIC_IP:4242"]
 
 lighthouse:
   am_lighthouse: false
@@ -440,7 +440,7 @@ Then enable and start it:
 sudo systemctl enable --now nebula
 ```
 
-Make sure any host firewall allows outbound UDP to `YOUR_VPS_PUBLIC_IP:4242`, or more restrictively allows that specific destination if egress is locked down.
+Make sure any host firewall allows outbound UDP to `VPS_PUBLIC_IP:4242`, or more restrictively allows that specific destination if egress is locked down.
 
 ### 5. Verify overlay connectivity
 
