@@ -6,7 +6,7 @@ script_url: "https://raw.githubusercontent.com/buildplan/docker/refs/heads/main/
 script_name: "compose-manager.sh"
 github_raw_url: "https://raw.githubusercontent.com/buildplan/docker/refs/heads/main/compose-manager.sh"
 github_repo_url: "https://github.com/buildplan/docker/"
-interactive: false
+interactive: true
 requires_sudo: false
 no_pipe: false
 ---
