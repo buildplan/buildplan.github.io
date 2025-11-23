@@ -1,8 +1,11 @@
 #!/bin/bash
 
 # Debian and Ubuntu Server Hardening Interactive Script
-# Version: 0.76 | 2025-11-10
+# Version: 0.77.1 | 2025-11-19
 # Changelog:
+# - v0.77.1: Auto SSH connection whitelist feat & whitelist deduplication.
+# - v0.77: User-configurable ignoreip functionality for configure_fail2ban function.
+#          Add a few more core packages in install_packages function.
 # - v0.76: Improve the flexibility of the built-in Docker daemon.json file to prevent any potential Docker issues.
 # - v0.75: Updated Docker daemon.json file to be more secure.
 # - v0.74: Add optional dtop (https://github.com/amir20/dtop) after docker installation.
@@ -81,7 +84,7 @@
 set -euo pipefail
 
 # --- Update Configuration ---
-CURRENT_VERSION="0.76"
+CURRENT_VERSION="0.77.1"
 SCRIPT_URL="https://raw.githubusercontent.com/buildplan/du_setup/refs/heads/main/du_setup.sh"
 CHECKSUM_URL="${SCRIPT_URL}.sha256"
 
@@ -232,7 +235,7 @@ print_header() {
     printf '%s\n' "${CYAN}╔═════════════════════════════════════════════════════════════════╗${NC}"
     printf '%s\n' "${CYAN}║                                                                 ║${NC}"
     printf '%s\n' "${CYAN}║       DEBIAN/UBUNTU SERVER SETUP AND HARDENING SCRIPT           ║${NC}"
-    printf '%s\n' "${CYAN}║                      v0.76 | 2025-11-10                         ║${NC}"
+    printf '%s\n' "${CYAN}║                     v0.77.1 | 2025-11-19                        ║${NC}"
     printf '%s\n' "${CYAN}║                                                                 ║${NC}"
     printf '%s\n' "${CYAN}╚═════════════════════════════════════════════════════════════════╝${NC}"
     printf '\n'
@@ -2553,6 +2556,50 @@ validate_ufw_port() {
     [[ "$port" =~ ^[0-9]+(/tcp|/udp)?$ ]]
 }
 
+validate_ip_or_cidr() {
+    local input="$1"
+    # IPv4 address (simple check)
+    if [[ "$input" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+        local -a octets
+        IFS='.' read -ra octets <<< "$input"
+        for octet in "${octets[@]}"; do
+            if [[ "$octet" -gt 255 ]]; then
+                return 1
+            fi
+        done
+        return 0
+    fi
+    # IPv4 CIDR (e.g., 10.0.0.0/8)
+    if [[ "$input" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}$ ]]; then
+        local ip="${input%/*}"
+        local cidr="${input##*/}"
+        local -a octets
+        IFS='.' read -ra octets <<< "$ip"
+        for octet in "${octets[@]}"; do
+            if [[ "$octet" -gt 255 ]]; then
+                return 1
+            fi
+        done
+        if [[ "$cidr" -ge 0 && "$cidr" -le 32 ]]; then
+            return 0
+        fi
+        return 1
+    fi
+    # IPv6 address (basic check)
+    if [[ "$input" =~ ^[0-9a-fA-F:]+$ && "$input" == *":"* && "$input" != *"/"* ]]; then
+        return 0
+    fi
+    # IPv6 CIDR (permissive check, allows compressed ::)
+    if [[ "$input" =~ ^[0-9a-fA-F:]+/[0-9]{1,3}$ && "$input" == *":"* ]]; then
+        local cidr="${input##*/}"
+        if [[ "$cidr" -ge 0 && "$cidr" -le 128 ]]; then
+            return 0
+        fi
+        return 1
+    fi
+    return 1
+}
+
 convert_to_bytes() {
     local size_upper="${1^^}" # Convert to uppercase for case-insensitivity
     local unit="${size_upper: -1}"
@@ -2811,6 +2858,7 @@ install_packages() {
         ufw fail2ban unattended-upgrades chrony \
         rsync wget vim htop iotop nethogs netcat-traditional ncdu \
         tree rsyslog cron jq gawk coreutils perl skopeo git \
+        apt-listchanges ca-certificates gnupg logrotate \
         ssh openssh-client openssh-server; then
         print_error "Failed to install one or more essential packages."
         exit 1
@@ -3603,8 +3651,85 @@ configure_firewall() {
 configure_fail2ban() {
     print_section "Fail2Ban Configuration"
 
+    # --- Collect User IPs to Ignore ---
+    local -a IGNORE_IPS=("127.0.0.1/8" "::1") # Array for easier dedup.
+    local -a INVALID_IPS=()
+    local prompt_change=""
+
+    # NEW: Auto-detect and offer to whitelist current SSH connection
+    if [[ -n "$SSH_CONNECTION" ]]; then
+        local CURRENT_IP="${SSH_CONNECTION%% *}"
+        print_info "Detected SSH connection from: $CURRENT_IP"
+
+        if confirm "Whitelist your current IP ($CURRENT_IP) in Fail2Ban?"; then
+            if validate_ip_or_cidr "$CURRENT_IP"; then
+                IGNORE_IPS+=("$CURRENT_IP")
+                print_success "Added your current IP to whitelist."
+                log "Auto-whitelisted SSH connection IP: $CURRENT_IP"
+            else
+                print_warning "Could not validate current IP. Please add it manually."
+            fi
+        fi
+        prompt_change=" additional" # Modifies following prompt based on presence of SSH connection.
+    fi
+
+    if [[ $VERBOSE != false ]] && \
+        confirm "Add$prompt_change IP addresses or CIDR ranges to Fail2Ban ignore list (e.g., Tailscale)?"; then
+        while true; do
+            local -a WHITELIST_IPS=()
+            log "Prompting user for IP addresses or CIDR ranges to whitelist via Fail2Ban ignore list..."
+            printf '%s\n' "${CYAN}Enter IP addresses or CIDR ranges to whitelist, separated by spaces.${NC}"
+            printf '%s\n' "Examples:"
+            printf '  %-24s %s\n' "Single IP:" "192.168.1.100"
+            printf '  %-24s %s\n' "CIDR Range:" "10.0.0.0/8"
+            printf '  %-24s %s\n' "IPv6 Address:" "2606:4700::1111"
+            printf '  %-24s %s\n' "Tailscale Range:" "100.64.0.0/10"
+            read -ra WHITELIST_IPS -p "  > "
+            if (( ${#WHITELIST_IPS[@]} == 0 )); then
+                print_info "No IP addresses entered. Skipping."
+                break
+            fi
+            local valid=true
+            INVALID_IPS=()
+            for ip in "${WHITELIST_IPS[@]}"; do
+                if ! validate_ip_or_cidr "$ip"; then
+                    valid=false
+                    INVALID_IPS+=("$ip")
+                fi
+            done
+            if [[ "$valid" == true ]]; then
+                IGNORE_IPS+=( "${WHITELIST_IPS[@]}" )
+                break
+            else
+                local s=""
+                (( ${#INVALID_IPS[@]} > 1 )) && s="s" # Plural if > 1
+                print_error "Invalid IP$s: ${INVALID_IPS[*]}"
+                printf '%s\n\n' "Please try again. Leave blank to skip."
+            fi
+        done
+    fi
+    # Deduplicate final IGNORE_IPS
+    if (( ${#IGNORE_IPS[@]} > 0 )); then
+        local -A seen=()
+        local -a unique=()
+        for ip in "${IGNORE_IPS[@]}"; do
+            if [[ ! -v seen[$ip] ]]; then
+                seen[$ip]=1
+                unique+=( "$ip" )
+            fi
+        done
+        IGNORE_IPS=( "${unique[@]}" )
+    fi
+    if (( ${#IGNORE_IPS[@]} > 2 )); then
+        local WHITELIST_STR
+        printf -v WHITELIST_STR "Whitelisting:\n"
+        for ip in "${IGNORE_IPS[@]:2}"; do # Skip first two entries in console output ("127.0.0.1/8" "::1").
+            printf -v WHITELIST_STR "%s  %s\n" "$WHITELIST_STR" "$ip"
+        done
+        print_info "$WHITELIST_STR"
+    fi
+
     # --- Define Desired Configurations ---
-    # Define content of config file.
     local UFW_PROBES_CONFIG
     UFW_PROBES_CONFIG=$(cat <<'EOF'
 [Definition]
@@ -3617,7 +3742,7 @@ EOF
     local JAIL_LOCAL_CONFIG
     JAIL_LOCAL_CONFIG=$(cat <<EOF
 [DEFAULT]
-ignoreip = 127.0.0.1/8 ::1
+ignoreip = ${IGNORE_IPS[*]}
 bantime = 1d
 findtime = 10m
 maxretry = 5
@@ -3641,7 +3766,6 @@ EOF
     local JAIL_LOCAL_PATH="/etc/fail2ban/jail.local"
 
     # --- Idempotency Check ---
-    # This checks if the on-disk files are already identical to our desired configuration.
     if [[ -f "$UFW_FILTER_PATH" && -f "$JAIL_LOCAL_PATH" ]] && \
        cmp -s "$UFW_FILTER_PATH" <<<"$UFW_PROBES_CONFIG" && \
        cmp -s "$JAIL_LOCAL_PATH" <<<"$JAIL_LOCAL_CONFIG"; then
@@ -3651,7 +3775,6 @@ EOF
     fi
 
     # --- Apply Configuration ---
-    # If the check above fails, we write the correct configuration files.
     print_info "Applying new Fail2Ban configuration..."
     mkdir -p /etc/fail2ban/filter.d
     echo "$UFW_PROBES_CONFIG" > "$UFW_FILTER_PATH"
@@ -3667,12 +3790,30 @@ EOF
     print_info "Enabling and restarting Fail2Ban to apply new rules..."
     systemctl enable fail2ban
     systemctl restart fail2ban
-    sleep 2 # Give the service a moment to initialize.
+    sleep 2
 
     if systemctl is-active --quiet fail2ban; then
         print_success "Fail2Ban is active with the new configuration."
-        # Show the status of the enabled jails for confirmation.
         fail2ban-client status | tee -a "$LOG_FILE"
+
+        # Show how to add IPs later
+        if (( ${#INVALID_IPS[@]} > 0 )) || confirm "Show instructions for adding IPs later?" "n"; then
+            printf "\n"
+            if [[ $VERBOSE == false ]]; then
+                printf '%s\n' "${PURPLE}ℹ Fail2Ban ignore list modification:${NC}"
+            fi
+            print_info "To add more IP addresses to Fail2Ban ignore list later:"
+            printf "%s1. Edit the configuration file:%s\n" "$CYAN" "$NC"
+            printf "   %ssudo nano /etc/fail2ban/jail.local%s\n" "$BOLD" "$NC"
+            printf "%s2. Update the 'ignoreip' line under [DEFAULT]:%s\n" "$CYAN" "$NC"
+            printf "   %signoreip = 127.0.0.1/8 ::1 YOUR_IP_HERE%s\n" "$BOLD" "$NC"
+            printf "%s3. Restart Fail2Ban:%s\n" "$CYAN" "$NC"
+            printf "   %ssudo systemctl restart fail2ban%s\n" "$BOLD" "$NC"
+            printf "%s4. Verify the configuration:%s\n" "$CYAN" "$NC"
+            printf "   %ssudo fail2ban-client status%s\n" "$BOLD" "$NC"
+            printf "\n"
+            log "Displayed post-installation Fail2Ban instructions."
+        fi
     else
         print_error "Fail2Ban service failed to start. Check 'journalctl -u fail2ban' for errors."
         FAILED_SERVICES+=("fail2ban")
