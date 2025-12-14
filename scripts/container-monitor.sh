@@ -3,7 +3,7 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 export LC_ALL=C
 set -uo pipefail
 
-# --- v0.79 ---
+# --- v0.80.4 ---
 # Description:
 # This script monitors Docker containers on the system.
 # It checks container status, resource usage (CPU, Memory, Disk, Network),
@@ -44,6 +44,7 @@ set -uo pipefail
 #   ./container-monitor.sh --prune                       - Run Docker's system prune to clean up unused resources.
 #   ./container-monitor.sh --force                       - Bypass cache and force a new check for image updates
 #   ./container-monitor.sh --no-update                   - Run without checking for a script update.
+#   ./container-monitor.sh --auto-update                 - Automatically update containers with floating tags (e.g. latest).
 #   ./container-monitor.sh --help [or -h]                - Shows script usage commands.
 #
 # Prerequisites:
@@ -55,8 +56,8 @@ set -uo pipefail
 #   - timeout (from coreutils, for docker exec commands)
 
 # --- Script & Update Configuration ---
-VERSION="v0.79"
-VERSION_DATE="2025-11-09"
+VERSION="v0.80.4"
+VERSION_DATE="2025-12-13"
 SCRIPT_URL="https://github.com/buildplan/container-monitor/raw/refs/heads/main/container-monitor.sh"
 CHECKSUM_URL="${SCRIPT_URL}.sha256" # sha256 hash check
 
@@ -111,20 +112,29 @@ _SCRIPT_DEFAULT_NTFY_ACCESS_TOKEN=""
 declare -a _SCRIPT_DEFAULT_CONTAINER_NAMES_ARRAY=()
 
 # --- Initialize Working Configuration ---
-LOG_LINES_TO_CHECK="$_SCRIPT_DEFAULT_LOG_LINES_TO_CHECK"
-CHECK_FREQUENCY_MINUTES="$_SCRIPT_DEFAULT_CHECK_FREQUENCY_MINUTES"
-LOG_FILE="$_SCRIPT_DEFAULT_LOG_FILE"
-CPU_WARNING_THRESHOLD="$_SCRIPT_DEFAULT_CPU_WARNING_THRESHOLD"
-MEMORY_WARNING_THRESHOLD="$_SCRIPT_DEFAULT_MEMORY_WARNING_THRESHOLD"
-DISK_SPACE_THRESHOLD="$_SCRIPT_DEFAULT_DISK_SPACE_THRESHOLD"
-NETWORK_ERROR_THRESHOLD="$_SCRIPT_DEFAULT_NETWORK_ERROR_THRESHOLD"
-HOST_DISK_CHECK_FILESYSTEM="$_SCRIPT_DEFAULT_HOST_DISK_CHECK_FILESYSTEM"
-NOTIFICATION_CHANNEL="$_SCRIPT_DEFAULT_NOTIFICATION_CHANNEL"
-DISCORD_WEBHOOK_URL="$_SCRIPT_DEFAULT_DISCORD_WEBHOOK_URL"
-NTFY_SERVER_URL="$_SCRIPT_DEFAULT_NTFY_SERVER_URL"
-NTFY_TOPIC="$_SCRIPT_DEFAULT_NTFY_TOPIC"
-NTFY_ACCESS_TOKEN="$_SCRIPT_DEFAULT_NTFY_ACCESS_TOKEN"
-CONTAINER_NAMES=""
+# Initialize variables
+LOG_LINES_TO_CHECK="${LOG_LINES_TO_CHECK:-$_SCRIPT_DEFAULT_LOG_LINES_TO_CHECK}"
+CHECK_FREQUENCY_MINUTES="${CHECK_FREQUENCY_MINUTES:-$_SCRIPT_DEFAULT_CHECK_FREQUENCY_MINUTES}"
+# Pre-load of Log File
+if [ -z "${LOG_FILE:-}" ] && [ -f "$SCRIPT_DIR/config.yml" ]; then
+    PRELOAD_LOG=$(grep -E "^[[:space:]]*log_file:" "$SCRIPT_DIR/config.yml" | head -n 1 | sed -E 's/.*log_file:[[:space:]]*["'\'']?([^"'\'']+)["'\'']?.*/\1/')
+    if [ -n "$PRELOAD_LOG" ]; then
+        if [[ "$PRELOAD_LOG" != /* ]]; then LOG_FILE="$SCRIPT_DIR/$PRELOAD_LOG"; else LOG_FILE="$PRELOAD_LOG"; fi
+    fi
+fi
+LOG_FILE="${LOG_FILE:-$_SCRIPT_DEFAULT_LOG_FILE}"
+# Initialize remaining variables
+CPU_WARNING_THRESHOLD="${CPU_WARNING_THRESHOLD:-$_SCRIPT_DEFAULT_CPU_WARNING_THRESHOLD}"
+MEMORY_WARNING_THRESHOLD="${MEMORY_WARNING_THRESHOLD:-$_SCRIPT_DEFAULT_MEMORY_WARNING_THRESHOLD}"
+DISK_SPACE_THRESHOLD="${DISK_SPACE_THRESHOLD:-$_SCRIPT_DEFAULT_DISK_SPACE_THRESHOLD}"
+NETWORK_ERROR_THRESHOLD="${NETWORK_ERROR_THRESHOLD:-$_SCRIPT_DEFAULT_NETWORK_ERROR_THRESHOLD}"
+HOST_DISK_CHECK_FILESYSTEM="${HOST_DISK_CHECK_FILESYSTEM:-$_SCRIPT_DEFAULT_HOST_DISK_CHECK_FILESYSTEM}"
+NOTIFICATION_CHANNEL="${NOTIFICATION_CHANNEL:-$_SCRIPT_DEFAULT_NOTIFICATION_CHANNEL}"
+DISCORD_WEBHOOK_URL="${DISCORD_WEBHOOK_URL:-$_SCRIPT_DEFAULT_DISCORD_WEBHOOK_URL}"
+NTFY_SERVER_URL="${NTFY_SERVER_URL:-$_SCRIPT_DEFAULT_NTFY_SERVER_URL}"
+NTFY_TOPIC="${NTFY_TOPIC:-$_SCRIPT_DEFAULT_NTFY_TOPIC}"
+NTFY_ACCESS_TOKEN="${NTFY_ACCESS_TOKEN:-$_SCRIPT_DEFAULT_NTFY_ACCESS_TOKEN}"
+CONTAINER_NAMES="${CONTAINER_NAMES:-}"
 declare -a CONTAINER_NAMES_FROM_CONFIG_FILE=()
 
 # --- Functions ---
@@ -215,10 +225,17 @@ load_configuration() {
     set_final_config "UPDATE_CHECK_CACHE_HOURS"      ".general.update_check_cache_hours"     "6"
     set_final_config "DOCKER_USERNAME"               ".auth.docker_username"                 ""
     set_final_config "DOCKER_PASSWORD"               ".auth.docker_password"                 ""
-    set_final_config "DOCKER_CONFIG_PATH"            ".auth.docker_config_path"              "~/.docker/config.json"
+    set_final_config "DOCKER_CONFIG_PATH"            ".auth.docker_config_path"              "$HOME/.docker/config.json"
     set_final_config "LOCK_TIMEOUT_SECONDS"          ".general.lock_timeout_seconds"         "10"
     set_final_config "HEALTHCHECKS_JOB_URL"          ".general.healthchecks_job_url"         ""
     set_final_config "HEALTHCHECKS_FAIL_ON"          ".general.healthchecks_fail_on"         ""
+    set_final_config "AUTO_UPDATE_ENABLED"           ".auto_update.enabled"                  "false"
+
+    mapfile -t AUTO_UPDATE_TAGS < <(yq e '.auto_update.tags[]' "$_CONFIG_FILE_PATH" 2>/dev/null)
+    if [ ${#AUTO_UPDATE_TAGS[@]} -eq 0 ]; then AUTO_UPDATE_TAGS=("latest" "stable" "main" "master" "nightly"); fi
+
+    mapfile -t AUTO_UPDATE_INCLUDE < <(yq e '.auto_update.include[]' "$_CONFIG_FILE_PATH" 2>/dev/null)
+    mapfile -t AUTO_UPDATE_EXCLUDE < <(yq e '.auto_update.exclude[]' "$_CONFIG_FILE_PATH" 2>/dev/null)
 
     if ! mapfile -t LOG_ERROR_PATTERNS < <(yq e '.logs.error_patterns[]' "$_CONFIG_FILE_PATH" 2>/dev/null); then
         print_message "Failed to parse log error patterns. Using defaults." "WARNING"
@@ -279,6 +296,7 @@ print_help() {
 
     printf '\n%bActions:%b\n' "$COLOR_GREEN" "$COLOR_RESET"
     printf '  %-64s %s\n' "${COLOR_YELLOW}--update${COLOR_RESET}" "${COLOR_CYAN}- Interactively pull and recreate containers with updates.${COLOR_RESET}"
+    printf '  %-64s %s\n' "${COLOR_YELLOW}--auto-update${COLOR_RESET}" "${COLOR_CYAN}- Automatically update containers with floating tags (e.g. latest).${COLOR_RESET}"
     printf '  %-64s %s\n' "${COLOR_YELLOW}--pull${COLOR_RESET}" "${COLOR_CYAN}- Interactively pull new images only (no recreation).${COLOR_RESET}"
     printf '  %-64s %s\n' "${COLOR_YELLOW}--summary [container...]${COLOR_RESET}" "${COLOR_CYAN}- Show only the final summary report, hiding individual checks.${COLOR_RESET}"
     printf '  %-64s %s\n' "${COLOR_YELLOW}--logs <container> [pattern...]${COLOR_RESET}" "${COLOR_CYAN}- Show recent logs for a container, with optional text filters.${COLOR_RESET}"
@@ -377,6 +395,65 @@ check_and_install_dependencies() {
     if ! command -v docker &>/dev/null; then
         print_message "Docker is not installed. This is a critical dependency. Please follow the official instructions at https://docs.docker.com/engine/install/" "DANGER"
         manual_install_needed=true
+    else
+        if ! docker info >/dev/null 2>&1; then
+            if [ "${CONTAINER_MONITOR_RELOADED:-false}" = "true" ]; then
+                print_message "Critical: Script reloaded but permissions are still denied." "DANGER"
+                print_message "Automatic fix failed. Please log out and log back in manually." "DANGER"
+                manual_install_needed=true
+            elif id -nG "$USER" | grep -qw "docker"; then
+                print_message "User '$USER' is already in the 'docker' group, but the current shell session is stale." "INFO"
+                if command -v sg &>/dev/null; then
+                    print_message "Auto-reloading script to activate permissions..." "GOOD"
+                    local args_str=""
+                    printf -v args_str "%q " "$@"
+                    export CONTAINER_MONITOR_RELOADED=true
+                    exec sg docker -c "$0 $args_str"
+                else
+                    print_message "Cannot auto-reload. Please run 'newgrp docker' or log out/in." "WARNING"
+                    manual_install_needed=true
+                fi
+            else
+                print_message "Docker is installed, but the current user ('$USER') cannot access the Docker daemon." "WARNING"
+                print_message "This usually means the user is not in the 'docker' group." "INFO"
+                if [ -t 0 ]; then
+                    read -rp "Would you like to add '$USER' to the 'docker' group to fix this? (y/n): " response
+                    if [[ "$response" =~ ^[yY]$ ]]; then
+                        print_message "Attempting to fix permissions..." "INFO"
+                        sudo groupadd docker 2>/dev/null || true
+                        if sudo usermod -aG docker "$USER"; then
+                            print_message "User '$USER' added to 'docker' group successfully." "GOOD"
+                            if [ -d "$HOME/.docker" ]; then
+                                print_message "Fixing ownership of ~/.docker directory..." "INFO"
+                                sudo chown -R "$USER":"$USER" "$HOME/.docker"
+                                sudo chmod -R g+rwx "$HOME/.docker"
+                            fi
+                            if command -v sg &>/dev/null; then
+                                print_message "Reloading script with new permissions..." "GOOD"
+                                local args_str=""
+                                printf -v args_str "%q " "$@"
+                                export CONTAINER_MONITOR_RELOADED=true
+                                exec sg docker -c "$0 $args_str"
+                            else
+                                print_message "Could not auto-reload. Please run 'newgrp docker' or log out and back in." "WARNING"
+                                exit 0
+                            fi
+                        else
+                            print_message "Failed to add user to group. Please run: sudo usermod -aG docker $USER" "DANGER"
+                            manual_install_needed=true
+                        fi
+                    else
+                        print_message "Skipping permission fix." "WARNING"
+                        print_message "To fix manually, run: sudo usermod -aG docker \$USER" "INFO"
+                        print_message "Then log out and back in." "INFO"
+                        manual_install_needed=true
+                    fi
+                else
+                    print_message "Cannot fix permissions interactively. To fix, run: sudo usermod -aG docker $USER" "DANGER"
+                    manual_install_needed=true
+                fi
+            fi
+        fi
     fi
     for cmd in "${!deps[@]}"; do
         if ! command -v "$cmd" &>/dev/null; then
@@ -390,13 +467,13 @@ check_and_install_dependencies() {
                 read -rp "Would you like to attempt to install them now? (y/n): " response
                 if [[ "$response" =~ ^[yY]$ ]]; then
                     print_message "Attempting to install with 'sudo $pkg_manager'... You may be prompted for your password." "INFO"
-                    local install_cmd=()
+                    local install_success=false
                     if [ "$pkg_manager" == "apt" ]; then
-                       sudo apt-get update && sudo apt-get install -y "${missing_pkgs[@]}"
+                       sudo apt-get update && sudo apt-get install -y "${missing_pkgs[@]}" && install_success=true
                     else
-                       sudo "$pkg_manager" install -y "${missing_pkgs[@]}"
+                       sudo "$pkg_manager" install -y "${missing_pkgs[@]}" && install_success=true
                     fi
-                    if [ $? -eq 0 ]; then
+                    if [ "$install_success" = true ]; then
                         print_message "Package manager dependencies installed successfully." "GOOD"
                     else
                         print_message "Failed to install dependencies. Please install them manually." "DANGER"
@@ -420,7 +497,7 @@ check_and_install_dependencies() {
         local tag_to_install="$2"
         print_message "Attempting to download yq... You may be prompted for your password." "INFO"
         if [ -z "$tag_to_install" ]; then
-             tag_to_install=$(curl -sL -o /dev/null -w %{url_effective} "https://github.com/mikefarah/yq/releases/latest" | xargs basename 2>/dev/null)
+             tag_to_install=$(curl -sL -o /dev/null -w "%{url_effective}" "https://github.com/mikefarah/yq/releases/latest" | xargs basename 2>/dev/null)
         fi
         if [ -z "$tag_to_install" ]; then
             print_message "Failed to get the latest yq version tag from GitHub." "DANGER"
@@ -457,7 +534,7 @@ check_and_install_dependencies() {
     else
         print_message "Checking for yq updates..." "INFO"
         local local_yq_version; local_yq_version=$(yq --version | awk '{print $NF}')
-        local latest_yq_tag; latest_yq_tag=$(curl -sL -o /dev/null -w %{url_effective} "https://github.com/mikefarah/yq/releases/latest" | xargs basename 2>/dev/null)
+        local latest_yq_tag; latest_yq_tag=$(curl -sL -o /dev/null -w "%{url_effective}" "https://github.com/mikefarah/yq/releases/latest" | xargs basename 2>/dev/null)
         if [[ -n "$latest_yq_tag" && "$local_yq_version" != "$latest_yq_tag" ]]; then
             if [ -t 0 ]; then
                 local api_url="https://api.github.com/repos/mikefarah/yq/releases/tags/${latest_yq_tag}"
@@ -481,7 +558,7 @@ check_and_install_dependencies() {
                 local update_msg="A new version of yq is available: ${latest_yq_tag} (you have ${local_yq_version})."
                 print_message "$update_msg" "WARNING"
                 print_message "To update, run the script manually from your terminal." "INFO"
-                local notif_title="⚠️ Dependency Update Recommended on $(hostname)"
+                local notif_title; notif_title="⚠️ Dependency Update Recommended on $(hostname)"
                 send_notification "$update_msg" "$notif_title"
             fi
         elif [ -n "$local_yq_version" ]; then
@@ -524,7 +601,7 @@ run_setup_check() {
         all_ok=false
     else
         local local_yq_version; local_yq_version=$(yq --version | awk '{print $NF}')
-        local latest_yq_tag; latest_yq_tag=$(curl -sL -o /dev/null -w %{url_effective} "https://github.com/mikefarah/yq/releases/latest" | xargs basename 2>/dev/null)
+        local latest_yq_tag; latest_yq_tag=$(curl -sL -o /dev/null -w "%{url_effective}" "https://github.com/mikefarah/yq/releases/latest" | xargs basename 2>/dev/null)
         if [[ -n "$latest_yq_tag" && "$local_yq_version" != "$latest_yq_tag" ]]; then
             print_message "❕ yq has an update available: ${latest_yq_tag} (you have ${local_yq_version})." "WARNING"
             print_message "  Run the script manually to get an update prompt." "INFO"
@@ -946,17 +1023,20 @@ send_discord_notification() {
         print_message "Discord webhook URL is not configured." "DANGER"
         return
     fi
+    local current_date
+    current_date=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
     local json_payload
     json_payload=$(jq -n \
                   --arg title "$title" \
                   --arg description "$message" \
+                  --arg timestamp "$current_date" \
                   '{
                     "username": "Docker Monitor",
                     "embeds": [{
                       "title": $title,
                       "description": $description,
                       "color": 15158332,
-                      "timestamp": "'$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")'"
+                      "timestamp": $timestamp
                     }]
                   }')
     run_with_retry curl -s -H "Content-Type: application/json" -X POST -d "$json_payload" "$DISCORD_WEBHOOK_URL" > /dev/null
@@ -1069,8 +1149,8 @@ self_update() {
         exit 1
     fi
     trap 'rm -rf -- "$temp_dir"' EXIT
-    local temp_script="$temp_dir/$(basename "$SCRIPT_URL")"
-    local temp_checksum="$temp_dir/$(basename "$CHECKSUM_URL")"
+    local temp_script; temp_script="$temp_dir/$(basename "$SCRIPT_URL")"
+    local temp_checksum; temp_checksum="$temp_dir/$(basename "$CHECKSUM_URL")"
     print_message "Downloading new script version..." "INFO"
     if ! curl -sL "$SCRIPT_URL" -o "$temp_script"; then
         print_message "Failed to download the new script. Update aborted." "DANGER"
@@ -1373,7 +1453,7 @@ check_for_updates() {
         skopeo_opts+=("--creds" "$DOCKER_USERNAME:$DOCKER_PASSWORD")
     fi
     get_release_url() { yq e ".containers.release_urls.\"${1}\" // \"\"" "$SCRIPT_DIR/config.yml"; }
-    if [[ "$current_tag" =~ ^(latest|stable|rolling)$ ]]; then
+    if [[ "$current_tag" =~ ^(latest|stable|rolling|main|master|nightly|edge)$ ]]; then
         strategy="digest"
     fi
     local latest_stable_version=""
@@ -1518,7 +1598,7 @@ check_logs() {
     fi
 }
 save_logs() {
-    local container_name="$1"; local log_file_name="${container_name}_logs_$(date '+%Y-%m-%d_%H-%M-%S').log"
+    local container_name="$1"; local log_file_name; log_file_name="${container_name}_logs_$(date '+%Y-%m-%d_%H-%M-%S').log"
     if docker logs "$container_name" > "$log_file_name" 2>"${log_file_name}.err"; then
         print_message "Logs for '$container_name' saved to '$log_file_name'." "GOOD"
     else
@@ -1599,7 +1679,10 @@ pull_new_image() {
 }
 is_rolling_tag() {
     local image_ref="$1"
-    if [[ "$image_ref" =~ :(latest|stable|rolling|dev|edge|nightly)(-.+)?$ ]]; then
+    if [[ "$image_ref" != *":"* ]]; then
+        return 0
+    fi
+    if [[ "$image_ref" =~ :(latest|stable|rolling|dev|edge|nightly|main|master)(-.+)?$ ]]; then
         return 0
     else
         return 1
@@ -1918,10 +2001,105 @@ perform_checks_for_container() {
         (IFS='|'; echo "${issue_tags[*]}") > "$results_dir/$container_actual_name.issues"
     fi
 }
+run_auto_update_mode() {
+    if [ "$AUTO_UPDATE_ENABLED" != "true" ]; then
+        print_message "Auto-update is disabled in config.yml." "WARNING"
+        return
+    fi
+    print_message "--- Starting Auto-Update Process ---" "INFO"
+    if [ ! -f "$STATE_FILE" ] || ! jq -e . "$STATE_FILE" >/dev/null 2>&1; then
+        echo '{"updates": {}, "restarts": {}, "logs": {}}' > "$STATE_FILE"
+    fi
+    local state_json; state_json=$(cat "$STATE_FILE")
+    mapfile -t all_containers < <(docker container ls --format '{{.Names}}' 2>/dev/null)
+    local successful_updates=()
+    local failed_updates=()
+    local updates_performed=0
+    for container in "${all_containers[@]}"; do
+        local skipped=false
+        for pattern in "${AUTO_UPDATE_EXCLUDE[@]}"; do
+            if [[ "$container" =~ $pattern ]]; then skipped=true; break; fi
+        done
+        if [ "$skipped" = true ]; then continue; fi
+        if [ ${#AUTO_UPDATE_INCLUDE[@]} -gt 0 ]; then
+            local included=false
+            for pattern in "${AUTO_UPDATE_INCLUDE[@]}"; do
+                if [[ "$container" =~ $pattern ]]; then included=true; break; fi
+            done
+            if [ "$included" = false ]; then continue; fi
+        fi
+        local compose_project
+        compose_project=$(docker inspect "$container" 2>/dev/null | jq -r '.[0].Config.Labels["com.docker.compose.project"] // empty')
+        if [ -z "$compose_project" ]; then
+            continue
+        fi
+        local current_image; current_image=$(docker inspect -f '{{.Config.Image}}' "$container" 2>/dev/null)
+        local tag_eligible=false
+        if [[ "$current_image" != *":"* ]]; then
+             for tag in "${AUTO_UPDATE_TAGS[@]}"; do
+                if [[ "$tag" == "latest" ]]; then
+                    tag_eligible=true; break
+                fi
+             done
+        else
+            for tag in "${AUTO_UPDATE_TAGS[@]}"; do
+                if [[ "$current_image" == *":$tag" ]] || [[ "$current_image" == *"$tag"* ]]; then
+                    tag_eligible=true; break
+                fi
+            done
+        fi
+        if [ "$tag_eligible" = false ]; then continue; fi
+        local old_force_flag="$FORCE_UPDATE_CHECK"
+        FORCE_UPDATE_CHECK=true
+        local update_details
+        update_details=$(check_for_updates "$container" "$current_image" "$state_json" 2>&1 | tail -n 1)
+        local update_status=$?
+        FORCE_UPDATE_CHECK="$old_force_flag"
+        if [ $update_status -ne 0 ]; then
+            print_message "Auto-updating '$container'..." "INFO"
+            process_container_update "$container" "$update_details"
+            if [ "$(docker inspect -f '{{.State.Status}}' "$container" 2>/dev/null)" == "running" ]; then
+                updates_performed=$((updates_performed + 1))
+                successful_updates+=("$container")
+                print_message "Update verified: '$container' is running." "GOOD"
+            else
+                failed_updates+=("$container")
+                print_message "Update check failed: '$container' is NOT running." "DANGER"
+            fi
+        fi
+    done
+    if [ ${#successful_updates[@]} -gt 0 ] || [ ${#failed_updates[@]} -gt 0 ]; then
+        local host_name; host_name=$(hostname)
+        local notif_title="🚀 Auto-Update Summary: ${host_name}"
+        local notif_msg=""
+        if [ ${#successful_updates[@]} -gt 0 ]; then
+            notif_msg+="✅ Updated (${#successful_updates[@]}):"
+            for c in "${successful_updates[@]}"; do
+                notif_msg+=$'\n  - '"$c"
+            done
+        fi
+        if [ ${#failed_updates[@]} -gt 0 ]; then
+            if [ -n "$notif_msg" ]; then notif_msg+=$'\n\n'; fi
+            notif_msg+="❌ Failed (${#failed_updates[@]}):"
+            for c in "${failed_updates[@]}"; do
+                notif_msg+=$'\n  - '"$c"
+            done
+        fi
+        send_notification "$notif_msg" "$notif_title"
+    fi
+    if [ "$updates_performed" -gt 0 ]; then
+        print_message "Cleaning up unused images..." "INFO"
+        docker image prune -f > /dev/null 2>&1
+        print_message "Auto-update complete. $updates_performed containers updated." "GOOD"
+    else
+        print_message "No auto-updates required." "INFO"
+    fi
+}
 
 # --- Main Execution ---
 main() {
     # --- Argument Parsing ---
+    local ORIGINAL_ARGS=("$@")
     declare -a CONTAINER_ARGS=()
     declare -a CONTAINERS_TO_EXCLUDE=()
     local ACTION="monitor" # Default action
@@ -1952,6 +2130,11 @@ main() {
                 ;;
             --summary)
                 SUMMARY_ONLY_MODE=true
+                shift
+                ;;
+            --auto-update)
+                if [[ "$ACTION" != "monitor" ]]; then print_message "Error: Cannot combine actions." "DANGER"; return 1; fi
+                ACTION="auto-update"
                 shift
                 ;;
 
@@ -2022,7 +2205,16 @@ main() {
     done
 
     # --- Initial Setup ---
-    check_and_install_dependencies
+    # Log Separation
+    if [ -f "$LOG_FILE" ] && [ -s "$LOG_FILE" ]; then
+        {
+            echo ""
+            echo "========================================================================"
+            echo ""
+        } >> "$LOG_FILE" 2>/dev/null || true
+    fi
+
+    check_and_install_dependencies "${ORIGINAL_ARGS[@]}"
     load_configuration
 
     # --- Self-Update Check ---
@@ -2067,6 +2259,9 @@ main() {
             ;;
         "monitor")
             perform_monitoring "${CONTAINER_ARGS[@]}"
+            ;;
+        "auto-update")
+            run_auto_update_mode
             ;;
     esac
 }
@@ -2325,7 +2520,7 @@ ${fail_details}"
             if [ "$notify_issues" = true ]; then
                 summary_message=$(echo -e "$summary_message" | sed 's/^[[:space:]]*//')
                 if [ -n "$summary_message" ]; then
-                    local notification_title="🚨 Container Monitor on $(hostname)"
+                    local notification_title; notification_title="🚨 Container Monitor on $(hostname)"
                     send_notification "$summary_message" "$notification_title"
                 fi
             fi
