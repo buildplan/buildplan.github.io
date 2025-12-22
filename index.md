@@ -52,3 +52,6 @@ Some of the project documentation for:
 
 * ### [**Nebula overlay VPN on a VPS**](./nebula/getting-started.md)
     A guide for setting up a Nebula overlay VPN using a generic VPS (Debian 12) as the Lighthouse.
+
+* ### [**IP Echo Service with Node.js and Docker**](./ip.wiredalter.com/about-ip-echo.md)
+    Building a Hybrid IP Echo Service with Node.js and Docker.
