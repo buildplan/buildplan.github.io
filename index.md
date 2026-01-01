@@ -2,7 +2,7 @@
 layout: default
 title: Home
 nav_order: 1
-last_modified_date: 2025-10-28T10:20:58+01:00
+last_modified_date: 2026-01-01T10:20:58+01:00
 ---
 
 # **buildplan Project Documentation!**
@@ -55,3 +55,7 @@ Some of the project documentation for:
 
 * ### [**IP Echo Service with Node.js and Docker**](./ip.wiredalter.com/about-ip-echo.md)
     Building a Hybrid IP Echo Service with Node.js and Docker.
+
+* ### [**A containerized, web-based terminal interface**](./wiredalter-term/about-wiredalter-term.md)
+    WiredAlter-Term is a containerized, web-based terminal interface designed to provide a persistent, portable, and customizable command-line environment accessible via a browser.
+
