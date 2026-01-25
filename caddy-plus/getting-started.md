@@ -1,7 +1,7 @@
 ---
 layout: default
 title: caddy-plus - caddy reverse proxy with mods
-nav_order: 15
+nav_order: 17
 parent: Home
 last_modified_date: 2026-01-25T01:58:00+01:00
 ---
