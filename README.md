@@ -19,4 +19,4 @@ The site automatically deploys to GitHub Pages via GitHub Actions when changes a
 
 ## License
 
-[CC0-1.0 license](https://github.com/buildplan/buildplan.github.io/blob/main/LICENSE)
+[CC0-1.0 license](/LICENSE)
