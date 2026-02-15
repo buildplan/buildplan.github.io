@@ -2,5 +2,44 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
-  ]
+  ],
+  "schedule": [
+    "before 6am on Monday"
+  ],
+  "timezone": "Europe/London",
+  "packageRules": [
+    {
+      "description": "Group all Bundler dependencies together",
+      "matchManagers": ["bundler"],
+      "groupName": "bundler dependencies",
+      "automerge": false
+    },
+    {
+      "description": "Automerge patch updates for Bundler",
+      "matchManagers": ["bundler"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Group GitHub Actions updates",
+      "matchManagers": ["github-actions"],
+      "groupName": "github-actions",
+      "pinDigests": true,
+      "automerge": true
+    },
+    {
+      "description": "Update github-pages gem weekly",
+      "matchPackageNames": ["github-pages"],
+      "schedule": ["before 6am on Monday"],
+      "groupName": "github-pages"
+    }
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on the first day of the month"]
+  },
+  "semanticCommits": "enabled",
+  "prConcurrentLimit": 3,
+  "prHourlyLimit": 2
 }
