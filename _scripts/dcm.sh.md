@@ -9,4 +9,5 @@ github_repo_url: "https://github.com/buildplan/dcm"
 interactive: false
 requires_sudo: true
 no_pipe: false
+download_name: "dcm"
 ---

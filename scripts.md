@@ -37,6 +37,14 @@ Scripts for various tools and configurations.
 
 > **Installation:** This script **cannot be piped** for safety. Please download it first.
 
+{% elsif script.download_name %}
+
+**Quick Install:**
+
+```bash
+curl -sSL {{ script.script_url }} -o {{ script.download_name }}
+```
+
 {% else %}
 
 **Quick Install (One-Liner):**
