@@ -43,6 +43,8 @@ Scripts for various tools and configurations.
 
 ```bash
 curl -sSL {{ script.script_url }} -o {{ script.download_name }}
+chmod +x {{ script.download_name }}
+sudo mv {{ script.download_name }} /usr/local/bin/
 ```
 
 {% else %}
