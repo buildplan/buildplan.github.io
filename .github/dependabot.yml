@@ -1,0 +1,29 @@
+version: 2
+updates:
+  # Maintain dependencies for Bundler (Jekyll plugins, etc.)
+  - package-ecosystem: "bundler"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/London"
+    groups:
+      # Group all bundler updates together into a single PR to reduce noise
+      bundler-dependencies:
+        patterns:
+          - "*"
+
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/London"
+    groups:
+      # Group all action updates together into a single PR
+      action-dependencies:
+        patterns:
+          - "*"
