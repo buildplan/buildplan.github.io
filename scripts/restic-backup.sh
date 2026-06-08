@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # =================================================================
-#           Restic Backup Script v0.43 - 2026.02.02
+#           Restic Backup Script v0.46 - 2026.05.24
 # =================================================================
 
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
@@ -9,7 +9,7 @@ set -euo pipefail
 umask 077
 
 # --- Script Constants ---
-SCRIPT_VERSION="0.43"
+SCRIPT_VERSION="0.46"
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 PROG_NAME=$(basename "$0"); readonly PROG_NAME
 CONFIG_FILE="${SCRIPT_DIR}/restic-backup.conf"
@@ -35,7 +35,6 @@ else
     C_CYAN=''
 fi
 
-# --- Ensure running as root ---
 display_help() {
     local readme_url="https://github.com/buildplan/restic-backup-script/blob/main/README.md"
 
@@ -47,6 +46,7 @@ display_help() {
     echo
     echo -e "${C_BOLD}${C_YELLOW}OPTIONS:${C_RESET}"
     printf "  ${C_GREEN}%-20s${C_RESET} %s\n" "--verbose" "Show detailed live output."
+    printf "  ${C_GREEN}%-20s${C_RESET} %s\n" "--fallback" "Temporarily route command to the fallback repository."
     printf "  ${C_GREEN}%-20s${C_RESET} %s\n" "--fix-permissions" "Interactive only: auto-fix 600/400 on conf/secret."
     printf "  ${C_GREEN}%-20s${C_RESET} %s\n" "--help, -h" "Display this help message."
     echo
@@ -59,6 +59,7 @@ display_help() {
     printf "  ${C_GREEN}%-20s${C_RESET} %s\n" "--stats" "Display repository size and file counts."
     printf "  ${C_GREEN}%-20s${C_RESET} %s\n" "--check" "Verify repository integrity (subset)."
     printf "  ${C_GREEN}%-20s${C_RESET} %s\n" "--check-full" "Verify all repository data (slow)."
+    printf "  ${C_GREEN}%-20s${C_RESET} %s\n" "--cache-cleanup" "Remove old/orphaned cache directories."
     printf "  ${C_GREEN}%-20s${C_RESET} %s\n" "--forget" "Apply retention policy; optionally prune."
     printf "  ${C_GREEN}%-20s${C_RESET} %s\n" "--unlock" "Remove stale repository locks."
     printf "  ${C_GREEN}%-20s${C_RESET} %s\n" "--dump <id> <path>" "Dump a single file from a snapshot to stdout."
@@ -73,6 +74,11 @@ display_help() {
     printf "  ${C_GREEN}%-20s${C_RESET} %s\n" "--install-scheduler" "Install an automated schedule (systemd/cron)."
     printf "  ${C_GREEN}%-20s${C_RESET} %s\n" "--recovery-kit" "Generate a self-contained recovery script (with embedded password)."
     printf "  ${C_GREEN}%-20s${C_RESET} %s\n" "--uninstall-scheduler" "Remove an automated schedule."
+    echo
+    echo -e "${C_BOLD}${C_YELLOW}CONFIG FEATURES:${C_RESET} (Managed in ${CONFIG_FILE})"
+    echo -e "  ${C_CYAN}Smart Exclusions:${C_RESET}  Auto-skips directories with CACHEDIR.TAG or custom files (e.g., .nobackup)."
+    echo -e "  ${C_CYAN}Time Retention:${C_RESET}    Keep-within policies (e.g., 30d, 1y) for resilient snapshot coverage."
+    echo -e "  ${C_CYAN}Resource Limits:${C_RESET}   Control CPU usage, SFTP connections, and upload bandwidth."
     echo
     echo -e "${C_BOLD}${C_YELLOW}QUICK EXAMPLES:${C_RESET}"
     echo -e "  Run a backup now:            ${C_GREEN}sudo $PROG_NAME${C_RESET}"
@@ -444,6 +450,16 @@ build_backup_command() {
     [ -n "${COMPRESSION:-}" ] && cmd+=(--compression "$COMPRESSION")
     [ -n "${PACK_SIZE:-}" ] && cmd+=(--pack-size "$PACK_SIZE")
     [ "${ONE_FILE_SYSTEM:-false}" = "true" ] && cmd+=(--one-file-system)
+    if [ "${EXCLUDE_CACHES:-false}" = "true" ]; then
+        cmd+=(--exclude-caches)
+    fi
+    if declare -p EXCLUDE_IF_PRESENT 2>/dev/null | grep -q "declare -a"; then
+        for f in "${EXCLUDE_IF_PRESENT[@]}"; do
+            cmd+=(--exclude-if-present "$f")
+        done
+    elif [ -n "${EXCLUDE_IF_PRESENT:-}" ]; then
+        cmd+=(--exclude-if-present "$EXCLUDE_IF_PRESENT")
+    fi
     [ -n "${EXCLUDE_FILE:-}" ] && [ -f "$EXCLUDE_FILE" ] && cmd+=(--exclude-file "$EXCLUDE_FILE")
     [ -n "${EXCLUDE_TEMP_FILE:-}" ] && cmd+=(--exclude-file "$EXCLUDE_TEMP_FILE")
     cmd+=("${BACKUP_SOURCES[@]}")
@@ -796,8 +812,24 @@ send_notification() {
 }
 
 setup_environment() {
-    export RESTIC_REPOSITORY
-    export RESTIC_PASSWORD_FILE
+    # Handle Fallback Routing
+    if [[ "${USE_FALLBACK:-false}" == "true" ]]; then
+        if [ -z "${RESTIC_FALLBACK_REPOSITORY:-}" ]; then
+            echo -e "${C_RED}ERROR: --fallback flag used, but RESTIC_FALLBACK_REPOSITORY is not set in config.${C_RESET}" >&2
+            exit 1
+        fi
+        export RESTIC_REPOSITORY="${RESTIC_FALLBACK_REPOSITORY}"
+        if [ -n "${RESTIC_FALLBACK_PASSWORD_FILE:-}" ]; then
+            export RESTIC_PASSWORD_FILE="${RESTIC_FALLBACK_PASSWORD_FILE}"
+        else
+            export RESTIC_PASSWORD_FILE # Fallback to primary password
+        fi
+        log_message "FALLBACK MODE ENGAGED: Routing to $RESTIC_REPOSITORY"
+        echo -e "${C_YELLOW}⚠️  Running in FALLBACK mode. Using alternate repository.${C_RESET}"
+    else
+        export RESTIC_REPOSITORY
+        export RESTIC_PASSWORD_FILE
+    fi
 
     if [ -n "${GOMAXPROCS_LIMIT:-}" ]; then
         export GOMAXPROCS="${GOMAXPROCS_LIMIT}"
@@ -1383,11 +1415,18 @@ run_forget() {
     read -ra v_flags <<< "$(get_verbosity_flags)"
     forget_cmd+=("${v_flags[@]}")
     forget_cmd+=(forget)
+    # Count-based retention
     [ -n "${KEEP_LAST:-}" ] && forget_cmd+=(--keep-last "$KEEP_LAST")
     [ -n "${KEEP_DAILY:-}" ] && forget_cmd+=(--keep-daily "$KEEP_DAILY")
     [ -n "${KEEP_WEEKLY:-}" ] && forget_cmd+=(--keep-weekly "$KEEP_WEEKLY")
     [ -n "${KEEP_MONTHLY:-}" ] && forget_cmd+=(--keep-monthly "$KEEP_MONTHLY")
     [ -n "${KEEP_YEARLY:-}" ] && forget_cmd+=(--keep-yearly "$KEEP_YEARLY")
+    # Time-based retention
+    [ -n "${KEEP_WITHIN:-}" ] && forget_cmd+=(--keep-within "$KEEP_WITHIN")
+    [ -n "${KEEP_WITHIN_DAILY:-}" ] && forget_cmd+=(--keep-within-daily "$KEEP_WITHIN_DAILY")
+    [ -n "${KEEP_WITHIN_WEEKLY:-}" ] && forget_cmd+=(--keep-within-weekly "$KEEP_WITHIN_WEEKLY")
+    [ -n "${KEEP_WITHIN_MONTHLY:-}" ] && forget_cmd+=(--keep-within-monthly "$KEEP_WITHIN_MONTHLY")
+    [ -n "${KEEP_WITHIN_YEARLY:-}" ] && forget_cmd+=(--keep-within-yearly "$KEEP_WITHIN_YEARLY")
     [ "${PRUNE_AFTER_FORGET:-true}" = "true" ] && forget_cmd+=(--prune)
     if run_with_priority "${forget_cmd[@]}" 2>&1 | tee -a "$LOG_FILE"; then
         log_message "Retention policy applied successfully"
@@ -1397,6 +1436,19 @@ run_forget() {
         echo -e "${C_YELLOW}⚠️ Retention policy failed${C_RESET}" >&2
         send_notification "Backup Warning: $HOSTNAME" "warning" \
             "${NTFY_PRIORITY_WARNING}" "warning" "Retention policy failed but backup completed"
+    fi
+}
+
+run_cache_cleanup() {
+    echo -e "${C_BOLD}--- Cleaning Restic Cache ---${C_RESET}"
+    log_message "Running restic cache --cleanup"
+    if restic cache --cleanup; then
+        echo -e "${C_GREEN}✅ Cache cleanup completed successfully.${C_RESET}"
+        log_message "Cache cleanup successful."
+    else
+        echo -e "${C_RED}❌ Cache cleanup failed.${C_RESET}" >&2
+        log_message "ERROR: Cache cleanup failed."
+        return 1
     fi
 }
 
@@ -1773,11 +1825,16 @@ EOF
 # 1. Parse flags.
 VERBOSE_MODE=false
 SKIP_OWNERSHIP_FIX=false
+USE_FALLBACK=false
 AUTO_FIX_PERMS=${AUTO_FIX_PERMS:-false}
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --verbose)
       VERBOSE_MODE=true
+      shift
+      ;;
+    --fallback)
+      USE_FALLBACK=true
       shift
       ;;
     --exact-ownership)
@@ -1912,6 +1969,10 @@ case "${1:-}" in
     --forget)
         run_preflight_checks "backup" "quiet"
         run_forget
+        ;;
+    --cache-cleanup)
+        run_preflight_checks "cache" "quiet"
+        run_cache_cleanup
         ;;
     --diff)
         run_preflight_checks "diff" "quiet"

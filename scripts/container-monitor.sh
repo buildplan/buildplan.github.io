@@ -3,7 +3,7 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 export LC_ALL=C
 set -uo pipefail
 
-# --- v0.82.0 ---
+# --- v0.82.5 ---
 # Description:
 # This script monitors Docker containers on the system.
 # It checks container status, resource usage (CPU, Memory, Disk, Network),
@@ -56,8 +56,8 @@ set -uo pipefail
 #   - timeout (from coreutils, for docker exec commands)
 
 # --- Script & Update Configuration ---
-VERSION="v0.82.0"
-VERSION_DATE="2026-02-27"
+VERSION="v0.82.5"
+VERSION_DATE="2026-06-07"
 SCRIPT_URL="https://github.com/buildplan/container-monitor/raw/refs/heads/main/container-monitor.sh"
 CHECKSUM_URL="${SCRIPT_URL}.sha256" # sha256 hash check
 
@@ -537,7 +537,7 @@ check_and_install_dependencies() {
     else
         print_message "Checking for yq updates..." "INFO"
         local local_yq_version; local_yq_version=$(yq --version | awk '{print $NF}')
-        local latest_yq_tag; latest_yq_tag=$(curl -sL -o /dev/null -w "%{url_effective}" "https://github.com/mikefarah/yq/releases/latest" | xargs basename 2>/dev/null)
+        local latest_yq_tag; latest_yq_tag=$(curl -s "https://api.github.com/repos/mikefarah/yq/releases/latest" | jq -r '.tag_name // empty')
         if [[ -n "$latest_yq_tag" && "$local_yq_version" != "$latest_yq_tag" ]]; then
             if [ -t 0 ]; then
                 local api_url="https://api.github.com/repos/mikefarah/yq/releases/tags/${latest_yq_tag}"
@@ -604,7 +604,7 @@ run_setup_check() {
         all_ok=false
     else
         local local_yq_version; local_yq_version=$(yq --version | awk '{print $NF}')
-        local latest_yq_tag; latest_yq_tag=$(curl -sL -o /dev/null -w "%{url_effective}" "https://github.com/mikefarah/yq/releases/latest" | xargs basename 2>/dev/null)
+        local latest_yq_tag; latest_yq_tag=$(curl -s "https://api.github.com/repos/mikefarah/yq/releases/latest" | jq -r '.tag_name // empty')
         if [[ -n "$latest_yq_tag" && "$local_yq_version" != "$latest_yq_tag" ]]; then
             print_message "❕ yq has an update available: ${latest_yq_tag} (you have ${local_yq_version})." "WARNING"
             print_message "  Run the script manually to get an update prompt." "INFO"
@@ -1171,13 +1171,13 @@ send_healthchecks_job_ping() {
     *)     : ;;
   esac
   if [[ -n "$body" ]]; then
-    (curl -fsS --connect-timeout 3 -m 8 --retry 1 \
-      --data-raw "$body" "$endpoint" >/dev/null 2>&1 || \
-      print_message "Healthchecks: job ping '$status' failed (curl)." "WARNING") &
+    curl -fsS -m 10 --retry 5 -o /dev/null \
+      --data-raw "$body" "$endpoint" 2>/dev/null || \
+      print_message "Healthchecks: job ping '$status' failed (curl)." "WARNING"
   else
-    (curl -fsS --connect-timeout 3 -m 8 --retry 1 \
-      "$endpoint" >/dev/null 2>&1 || \
-      print_message "Healthchecks: job ping '$status' failed (curl)." "WARNING") &
+    curl -fsS -m 10 --retry 5 -o /dev/null \
+      "$endpoint" 2>/dev/null || \
+      print_message "Healthchecks: job ping '$status' failed (curl)." "WARNING"
   fi
 }
 self_update() {
@@ -1461,11 +1461,22 @@ check_for_updates() {
             return 0
         fi
     done
-    if ! command -v skopeo &>/dev/null; then print_message "  ${COLOR_BLUE}Update Check:${COLOR_RESET} skopeo not installed. Skipping." "INFO" >&2; return 0; fi
+    if ! command -v skopeo &>/dev/null; then print_message "  ${COLOR_BLUE}Update Check:${COLOR_RESET} skopeo not installed. Skipping." "WARNING" >&2; return 2; fi
     if [[ "$current_image_ref" == *@sha256:* || "$current_image_ref" =~ ^sha256: ]]; then
         print_message "  ${COLOR_BLUE}Update Check:${COLOR_RESET} Image for '$container_name' is pinned by digest. Skipping." "INFO" >&2; return 0
     fi
-    local local_inspect; local_inspect=$(docker inspect "$current_image_ref" 2>/dev/null)
+    local container_inspect; container_inspect=$(docker inspect "$container_name" 2>/dev/null)
+    local container_image_id; container_image_id=$(jq -r '.[0].Image // empty' <<< "$container_inspect" 2>/dev/null)
+    local tagged_inspect; tagged_inspect=$(docker inspect "$current_image_ref" 2>/dev/null)
+    local tagged_image_id; tagged_image_id=$(jq -r '.[0].Id // empty' <<< "$tagged_inspect" 2>/dev/null)
+
+    if [[ -n "$container_image_id" && -n "$tagged_image_id" && "$container_image_id" != "$tagged_image_id" ]]; then
+        print_message "  ${COLOR_BLUE}Update Check:${COLOR_RESET} Update available: Newer image already pulled locally (pending recreate)." "WARNING" >&2
+        echo "Update available (Pending recreate)"
+        return 100
+    fi
+
+    local local_inspect; local_inspect=$(docker inspect "${container_image_id:-$current_image_ref}" 2>/dev/null)
     if ! jq -e '.[0].RepoDigests and (.[0].RepoDigests | length) > 0' <<< "$local_inspect" >/dev/null 2>&1; then
         print_message "  ${COLOR_BLUE}Update Check:${COLOR_RESET} Skipping '$container_name' (local or non-registry image)." "INFO" >&2
         return 0
@@ -1522,6 +1533,8 @@ check_for_updates() {
     local latest_stable_version=""
     local update_check_failed=false
     local error_message=""
+    local sort_cmd=("sort" "-V")
+    if ! echo -e "2\n1" | sort -V &>/dev/null; then sort_cmd=("sort" "-t." "-k1,1n" "-k2,2n" "-k3,3n"); fi
     case "$strategy" in
         "digest")
             local local_digest; local_digest=$(jq -r '(.[0].RepoDigests[]? | select(startswith("'"$registry_host/$image_path_for_skopeo"'@")) | split("@")[1]) // (.[0].RepoDigests[0]? | split("@")[1])' <<< "$local_inspect")
@@ -1529,7 +1542,7 @@ check_for_updates() {
                 error_message="Could not get local digest for '$current_image_ref'. Cannot check tag '$current_tag'."
                 update_check_failed=true
             else
-                local remote_inspect_output; remote_inspect_output=$(skopeo "${skopeo_opts[@]}" inspect --no-tags "${skopeo_repo_ref}:${current_tag}" 2>&1)
+                local remote_inspect_output; remote_inspect_output=$(timeout 45 skopeo "${skopeo_opts[@]}" inspect --no-tags "${skopeo_repo_ref}:${current_tag}" 2>&1)
                 if [ $? -ne 0 ]; then
                     error_message="Error inspecting remote image '${skopeo_repo_ref}:${current_tag}'. Details: $remote_inspect_output"
                     update_check_failed=true
@@ -1548,20 +1561,25 @@ check_for_updates() {
             fi
             ;;
         *)
-            local skopeo_output; skopeo_output=$(skopeo "${skopeo_opts[@]}" list-tags "$skopeo_repo_ref" 2>&1)
+            local skopeo_output; skopeo_output=$(timeout 45 skopeo "${skopeo_opts[@]}" list-tags "$skopeo_repo_ref" 2>&1)
             if [ $? -ne 0 ]; then
                 error_message="Error listing tags for '${skopeo_repo_ref}'. Details: $skopeo_output"
                 update_check_failed=true
             else
                 local tag_filter
-                local sort_cmd=("sort" "-V")
+                local prefix_part=""
                 local suffix_part=""
-                if [[ "$current_tag" =~ ^(v?[0-9]+(\.[0-9]+)*)(.*)$ ]]; then
-                    suffix_part="${BASH_REMATCH[3]}"
+                if [[ "$current_tag" =~ ^([^0-9]*)([0-9]+(\.[0-9]+)*)(.*)$ ]]; then
+                    prefix_part="${BASH_REMATCH[1]}"
+                    suffix_part="${BASH_REMATCH[4]}"
                 fi
-                if [ -n "$suffix_part" ]; then
-                    local escaped_suffix; escaped_suffix="${suffix_part//./\\.}"
-                    tag_filter="^[v]?[0-9\.]+$escaped_suffix$"
+                if [[ -n "$prefix_part" && "$prefix_part" != "v" ]] || [ -n "$suffix_part" ]; then
+                    local escaped_prefix="${prefix_part//./\\.}"
+                    local escaped_suffix="${suffix_part//./\\.}"
+                    if [ -z "$escaped_prefix" ] || [ "$escaped_prefix" == "v" ]; then
+                        escaped_prefix="[v]?"
+                    fi
+                    tag_filter="^${escaped_prefix}[0-9\.]+${escaped_suffix}$"
                     latest_stable_version=$(echo "$skopeo_output" | jq -r '.Tags[]' | grep -E "$tag_filter" | "${sort_cmd[@]}" | tail -n 1)
                 else
                     if [[ "$strategy" == "major-lock" ]]; then
@@ -1598,7 +1616,7 @@ check_for_updates() {
         print_message "  ${COLOR_BLUE}Update Check:${COLOR_RESET} $summary_message" "WARNING" >&2
         echo "$summary_message"
         return 100
-    elif [[ "v$current_tag" != "v$latest_stable_version" && "$current_tag" != "$latest_stable_version" ]] && [[ "$(printf '%s\n' "$latest_stable_version" "$current_tag" | sort -V | tail -n 1)" == "$latest_stable_version" ]]; then
+    elif [[ "v$current_tag" != "v$latest_stable_version" && "$current_tag" != "$latest_stable_version" ]] && [[ "$(printf '%s\n' "${latest_stable_version#v}" "${current_tag#v}" | "${sort_cmd[@]}" | tail -n 1)" == "${latest_stable_version#v}" ]]; then
         local summary_message="Update available: ${latest_stable_version}"
         local release_url; release_url=$(get_release_url "$lookup_name")
         if [ -n "$release_url" ]; then summary_message+=", Notes: $release_url"; fi
@@ -1624,8 +1642,9 @@ check_logs() {
     docker_logs_cmd+=("$container_name")
     local raw_logs cli_stderr
     local tmp_err; tmp_err=$(mktemp)
-    raw_logs=$("${docker_logs_cmd[@]}" 2> "$tmp_err"); local docker_exit_code=$?
-    cli_stderr=$(<"$tmp_err")
+    raw_logs=$("${docker_logs_cmd[@]}" 2> "$tmp_err" | tr -d '\0')
+    local docker_exit_code; docker_exit_code=${PIPESTATUS[0]}
+    cli_stderr=$(tr -d '\0' < "$tmp_err")
     rm -f "$tmp_err"
     if [ -n "$cli_stderr" ]; then
         if [ $docker_exit_code -ne 0 ]; then
@@ -1969,7 +1988,7 @@ print_summary() {
     local -A seen_containers
     local unique_containers=()
     for container in "${WARNING_OR_ERROR_CONTAINERS[@]}"; do
-        if ! [[ -v seen_containers[$container] ]]; then
+        if [[ -z "${seen_containers[$container]:-}" ]]; then
             unique_containers+=("$container")
             seen_containers["$container"]=1
         fi
@@ -2575,7 +2594,7 @@ ${fail_details}"
             local -A seen_containers_notif
             local unique_containers_notif=()
             for container in "${WARNING_OR_ERROR_CONTAINERS[@]}"; do
-                if ! [[ -v seen_containers_notif[$container] ]]; then
+                if [[ -z "${seen_containers_notif[$container]:-}" ]]; then
                     unique_containers_notif+=("$container")
                     seen_containers_notif["$container"]=1
                 fi
