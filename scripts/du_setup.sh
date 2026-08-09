@@ -1,8 +1,10 @@
 #!/bin/bash
 
 # Debian and Ubuntu Server Hardening Interactive Script
-# Version: 0.81.1 | 2026-07-05
+# Version: 0.81.2 | 2026-08-08
 # Changelog:
+# - v0.81.2: Switch Fail2Ban UFW banaction to ipset for improved performance when handling large ban lists.
+#            Update UFW SSH rule from allow to limit to provide native brute-force protection.
 # - v0.81.1: Fix IPv6 connectivity issues with Secure DNS. 
 #            Implement Docker-compatible IPv6 SLAAC sysctl configuration and enable native IPv6 networking in Docker daemon.
 # - v0.81.0: Added optional encrypted DNS (DoT) setup using Quad9 and Cloudflare.
@@ -280,7 +282,7 @@ print_header() {
     printf '%s\n' "${CYAN}╔═════════════════════════════════════════════════════════════════╗${NC}"
     printf '%s\n' "${CYAN}║                                                                 ║${NC}"
     printf '%s\n' "${CYAN}║       DEBIAN/UBUNTU SERVER SETUP AND HARDENING SCRIPT           ║${NC}"
-    printf '%s\n' "${CYAN}║                      v0.81.1 | 2026-07-05                       ║${NC}"
+    printf '%s\n' "${CYAN}║                      v0.81.2 | 2026-08-08                       ║${NC}"
     printf '%s\n' "${CYAN}║                                                                 ║${NC}"
     printf '%s\n' "${CYAN}╚═════════════════════════════════════════════════════════════════╝${NC}"
     printf '\n'
@@ -3340,8 +3342,9 @@ cleanup_and_exit() {
         print_error "An error occurred. Rolling back SSH changes to port $PREVIOUS_SSH_PORT..."
         print_info "Rolling back firewall rules..."
         ufw delete allow "$SSH_PORT"/tcp 2>/dev/null || true
+        ufw delete limit "$SSH_PORT"/tcp 2>/dev/null || true
         if [[ -n "$PREVIOUS_SSH_PORT" ]]; then
-            ufw allow "$PREVIOUS_SSH_PORT"/tcp comment 'SSH Rollback' 2>/dev/null || true
+            ufw limit "$PREVIOUS_SSH_PORT"/tcp comment 'SSH Rollback' 2>/dev/null || true
             print_info "Firewall rolled back to allow port $PREVIOUS_SSH_PORT."
         else
             print_warning "Could not determine previous SSH port for firewall rollback."
@@ -3563,6 +3566,7 @@ EOF
                 # Remove temporary UFW rule
                 print_info "Removing temporary UFW rule for old SSH port $PREVIOUS_SSH_PORT..."
                 ufw delete allow "$PREVIOUS_SSH_PORT"/tcp 2>/dev/null || true
+                ufw delete limit "$PREVIOUS_SSH_PORT"/tcp 2>/dev/null || true
                 break
             else
                 (( retry_count++ ))
@@ -3948,7 +3952,7 @@ configure_firewall() {
     fi
     if ! ufw status | grep -qw "$SSH_PORT/tcp"; then
         print_info "Adding SSH rule for port $SSH_PORT..."
-        ufw allow "$SSH_PORT"/tcp comment 'Custom SSH'
+        ufw limit "$SSH_PORT"/tcp comment 'Custom SSH'
     else
         print_info "SSH rule for port $SSH_PORT already exists."
     fi
@@ -4039,7 +4043,7 @@ configure_firewall() {
     if [[ -n "$PREVIOUS_SSH_PORT" && "$PREVIOUS_SSH_PORT" != "$SSH_PORT" ]]; then
         print_info "Temporarily adding UFW rule for current SSH port $PREVIOUS_SSH_PORT for transition..."
         if ! ufw status | grep -qw "$PREVIOUS_SSH_PORT/tcp"; then
-            ufw allow "$PREVIOUS_SSH_PORT"/tcp comment 'Temporary SSH for transition'
+            ufw limit "$PREVIOUS_SSH_PORT"/tcp comment 'Temporary SSH for transition'
         fi
     fi
     print_info "Enabling firewall..."
@@ -4062,10 +4066,10 @@ configure_fail2ban() {
     print_section "Fail2Ban Configuration"
 
     # Install Fail2Ban if not present
-    if ! dpkg -l fail2ban | grep -q ^ii; then
-        print_info "Installing Fail2Ban..."
-        if ! apt-get install -y -qq fail2ban; then
-            print_error "Failed to install Fail2Ban."
+    if ! dpkg -l fail2ban | grep -q ^ii || ! dpkg -l ipset | grep -q ^ii; then
+        print_info "Installing Fail2Ban and ipset..."
+        if ! apt-get install -y -qq fail2ban ipset; then
+            print_error "Failed to install Fail2Ban or ipset."
             return 1
         fi
     fi
@@ -4181,7 +4185,7 @@ ignoreip = ${IGNORE_IPS[*]}
 bantime = 1d
 findtime = 10m
 maxretry = 5
-banaction = ufw
+banaction = iptables-ipset-proto6-allports
 
 [sshd]
 enabled = true
@@ -6169,6 +6173,7 @@ generate_summary() {
     # Adjust verification commands based on selection
     if [[ "$IDS_INSTALLED" == "fail2ban" ]]; then
         printf "  %-28s ${CYAN}%s${NC}\n" "- Fail2Ban sshd jail:" "sudo fail2ban-client status sshd"
+        printf "  %-28s ${CYAN}%s${NC}\n" "- IPSet banned IPs:" "sudo ipset list"
     elif [[ "$IDS_INSTALLED" == "crowdsec" ]]; then
         printf "  %-28s ${CYAN}%s${NC}\n" "- CrowdSec status:" "sudo cscli metrics"
         printf "  %-28s ${CYAN}%s${NC}\n" "- CrowdSec bans:" "sudo cscli decisions list"
