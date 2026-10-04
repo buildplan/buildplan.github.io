@@ -4,7 +4,7 @@ export LC_ALL=C
 set -uo pipefail
 
 
-# --- v0.83.1 ---
+# --- v0.83.2 ---
 # Description:
 # This script monitors Docker containers on the system.
 # It checks container status, resource usage (CPU, Memory, Disk, Network),
@@ -86,8 +86,8 @@ if (( BASH_VERSINFO[0] == 4 && BASH_VERSINFO[1] < 4 )); then
 fi
 
 # --- Script & Update Configuration ---
-VERSION="v0.83.1"
-VERSION_DATE="2026-08-08"
+VERSION="v0.83.2"
+VERSION_DATE="2026-10-01"
 SCRIPT_URL="https://github.com/buildplan/container-monitor/raw/refs/heads/main/container-monitor.sh"
 CHECKSUM_URL="${SCRIPT_URL}.sha256" # sha256 hash check
 
@@ -2511,21 +2511,32 @@ perform_monitoring() {
         trap 'rm -rf "$results_dir"' EXIT INT TERM
         local progress_pipe="${results_dir}/progress_pipe"
         if [ -f "$LOCK_FILE" ]; then
-            local locked_pid; locked_pid=$(cat "$LOCK_FILE")
-            if ! ps -p "$locked_pid" > /dev/null; then
+            local locked_pid; locked_pid=$(cat "$LOCK_FILE" 2>/dev/null || true)
+            if [ -n "$locked_pid" ] && ! ps -p "$locked_pid" > /dev/null; then
                 print_message "Removing stale lock file for non-existent PID $locked_pid." "WARNING"
                 rm -f "$LOCK_FILE"
             fi
         fi
         local lock_dir; lock_dir="${SCRIPT_DIR}/.monitor.lock"
         local lock_attempts=0
-        local max_lock_attempts=10
+        local max_lock_attempts="${LOCK_TIMEOUT_SECONDS:-10}"
         while ! mkdir "$lock_dir" 2>/dev/null; do
-            if [ "$(find "$lock_dir" -mmin +10 2>/dev/null)" ]; then
-                echo "Removing stale lock directory..."
-                rmdir "$lock_dir"
+            local stale=false
+            if [ -f "$lock_dir/pid" ]; then
+                local lock_pid; lock_pid=$(cat "$lock_dir/pid" 2>/dev/null || true)
+                if [ -n "$lock_pid" ] && ! ps -p "$lock_pid" >/dev/null 2>&1; then
+                    print_message "Removing stale lock directory for non-existent PID $lock_pid." "WARNING"
+                    stale=true
+                fi
+            elif [ "$(find "$lock_dir" -mmin +10 2>/dev/null)" ]; then
+                echo "Removing stale lock directory (older than 10 mins)..."
+                stale=true
             fi
-            if [ $lock_attempts -ge $max_lock_attempts ]; then
+            if [ "$stale" = true ]; then
+                rm -rf "$lock_dir"
+                continue
+            fi
+            if [ "$lock_attempts" -ge "$max_lock_attempts" ]; then
                 print_message "Could not acquire lock after ${max_lock_attempts}s. Check '$lock_dir'." "DANGER"
                 rm -rf "$results_dir"
                 exit 1
@@ -2533,8 +2544,9 @@ perform_monitoring() {
             sleep 1
             lock_attempts=$((lock_attempts + 1))
         done
+        echo "$$" > "$lock_dir/pid"
         # shellcheck disable=SC2064
-        trap "rmdir '$lock_dir'; rm -rf '$results_dir'" EXIT
+        trap "rm -rf '$lock_dir'; rm -rf '$results_dir'" EXIT INT TERM
         if [[ -n "$HEALTHCHECKS_JOB_URL" ]]; then
           send_healthchecks_job_ping "$HEALTHCHECKS_JOB_URL" "start"
         fi
@@ -2768,7 +2780,7 @@ ${fail_details}"
         ' <<< "$new_state_json")
         echo "$new_state_json" > "${STATE_FILE}.tmp" && mv "${STATE_FILE}.tmp" "$STATE_FILE"
         if [ -d "$lock_dir" ]; then
-            rmdir "$lock_dir"
+            rm -rf "$lock_dir"
         fi
         rm -rf "$results_dir"
         trap - EXIT INT TERM
