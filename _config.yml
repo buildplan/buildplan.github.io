@@ -27,9 +27,10 @@ gh_edit_repository: "https://github.com/buildplan/buildplan.github.io"
 gh_edit_branch: "main"
 gh_edit_view_mode: "tree"
 
-# Include scripts directory for curl access
+# Include scripts directory for curl access and .well-known for OpenPGP WKD
 include:
   - scripts
+  - .well-known
 
 keep_files:
   - scripts
