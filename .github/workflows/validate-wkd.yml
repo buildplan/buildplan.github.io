@@ -1,0 +1,30 @@
+name: Validate OpenPGP WKD
+
+on:
+  push:
+    paths:
+      - '.well-known/**'
+      - '_config.yml'
+      - 'CNAME'
+      - '.github/scripts/wkd.sh'
+      - '.github/workflows/validate-wkd.yml'
+  pull_request:
+    paths:
+      - '.well-known/**'
+      - '_config.yml'
+      - 'CNAME'
+      - '.github/scripts/wkd.sh'
+      - '.github/workflows/validate-wkd.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Validate OpenPGP WKD files and Jekyll config
+        run: .github/scripts/wkd.sh validate
